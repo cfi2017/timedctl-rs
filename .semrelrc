@@ -1,0 +1,26 @@
+{
+  "plugins": {
+    "commit-analyzer": {
+      "name": "default"
+    },
+    "ci-condition": {
+      "name": "default"
+    },
+    "changelog-generator": {
+      "name": "default"
+    },
+    "files-updater": {
+      "name": "cargo"
+    }
+  },
+  "assets": [
+    {
+      "path": "target/release/timedctl",
+      "label": "timedctl-linux-amd64"
+    },
+    {
+      "path": "target/release/timedctl.exe",
+      "label": "timedctl-windows-amd64.exe"
+    }
+  ]
+}

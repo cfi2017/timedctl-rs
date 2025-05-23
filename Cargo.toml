@@ -1,0 +1,63 @@
+[package]
+name = "timedctl-rs"
+version = "0.1.0"
+edition = "2021"
+authors = ["Christian Fiedler <christian.fiedler@adfinis.com>", "timedctl-rs contributors"]
+description = "A command-line tool for interacting with the Timed time tracking service"
+repository = "https://github.com/cfi2017/timedctl-rs"
+license = "MIT"
+readme = "README.md"
+
+[lib]
+name = "libtimed"
+path = "src/lib.rs"
+
+[[bin]]
+name = "timedctl"
+path = "src/main.rs"
+
+[dependencies]
+# HTTP client
+reqwest = { version = "0.11", features = ["json", "rustls-tls"], default-features = false }
+# Async runtime
+tokio = { version = "1.32", features = ["full"] }
+# JSON serialization/deserialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+# CLI framework
+clap = { version = "4.4", features = ["derive"] }
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+# DateTime handling
+chrono = { version = "0.4", features = ["serde"] }
+# Secure token storage
+keyring = "2.0"
+# Config handling
+config = "0.13"
+toml = "0.5"
+# TUI components
+ratatui = "0.23"
+crossterm = "0.27"
+dialoguer = { version = "0.10", features = ["fuzzy-select"] }
+# HTTP request caching
+cached = "0.44"
+# Path handling
+dirs = "5.0"
+# Base64 encoding/decoding
+base64 = "0.21"
+# Web browser control
+
+
+webbrowser = "0.8"
+
+[dev-dependencies]
+# Mock HTTP for testing
+mockito = "1.2"
+# Test helpers
+pretty_assertions = "1.4"
+rstest = "0.18"
+tempfile = "3.8"

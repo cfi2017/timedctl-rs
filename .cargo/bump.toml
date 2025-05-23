@@ -1,0 +1,11 @@
+[package]
+tag_prefix = ""
+tag_name = "{{version}}"
+tag_message = "Release {{version}}"
+pre_bump_hooks = [
+    "cargo fmt --all",
+    "cargo test"
+]
+post_bump_hooks = [
+    "git add Cargo.toml Cargo.lock"
+]
