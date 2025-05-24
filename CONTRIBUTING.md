@@ -25,14 +25,19 @@ Please be respectful and considerate of others when contributing to this project
    ```
 3. Install Go from [go.dev](https://go.dev/dl/) (required for go-semantic-release)
 4. Install go-semantic-release: `go install github.com/go-semantic-release/semantic-release/v2@latest`
-5. Run tests to make sure everything is working: `cargo test`
+5. Install pre-commit: [pre-commit.com](https://pre-commit.com/#install)
+6. Set up the git hooks: `pre-commit install`
+7. Run tests to make sure everything is working: `cargo test`
 
 ### Making Changes
 
 1. Make your changes in your feature branch
 2. Write or update tests as needed
-3. Ensure your code follows the Rust style guidelines (run `cargo fmt`)
-4. Run the linter: `cargo clippy`
+3. Pre-commit hooks will automatically run when you commit to:
+   - Format code with `cargo fmt`
+   - Check code with `cargo clippy`
+   - Fix trailing whitespace and file endings
+4. You can also run the hooks manually: `pre-commit run --all-files`
 5. Run tests: `cargo test`
 
 ## Commit Message Guidelines

@@ -454,7 +454,7 @@ async fn main() -> Result<()> {
                 Ok(path) => path,
                 Err(e) => {
                     error!("Failed to get default config path: {}", e);
-                    return PathBuf::new(); // Return empty path as fallback
+                    PathBuf::new() // Return empty path as fallback
                 }
             }
         });

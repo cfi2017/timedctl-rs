@@ -110,7 +110,7 @@ This document tracks the progress of implementing API endpoints and functionalit
 
 2. **Core Endpoints**
    - ✅ Attendance endpoints
-   - ✅ Absence endpoints 
+   - ✅ Absence endpoints
    - ✅ Bulk operations for reports
 
 3. **Statistics Endpoints**
@@ -159,7 +159,7 @@ pub async fn bulk_update_reports(client: &TimedClient, filter: &FilterParams, up
     let response = client
         .post::<_, serde_json::Value>("reports/bulk", &updates)
         .await?;
-    
+
     // Handle response
     Ok(())
 }
@@ -174,15 +174,15 @@ The statistics endpoints provide valuable aggregated data:
 pub async fn get_year_statistics(client: &TimedClient, year: i32, user_id: Option<&str>) -> Result<YearStatistic> {
     let mut filter = FilterParams::default();
     filter.custom.insert("year".to_string(), year.to_string());
-    
+
     if let Some(id) = user_id {
         filter.custom.insert("user".to_string(), id.to_string());
     }
-    
+
     let response = client
         .get::<ResourceResponse<YearStatistic>>("year-statistics", Some(&filter))
         .await?;
-    
+
     Ok(response.data)
 }
 ```
@@ -204,11 +204,11 @@ pub async fn create_attendance(client: &TimedClient, date: &str, from_time: &str
         },
         relationships: Default::default(),
     };
-    
+
     let response = client
         .post::<_, ResourceResponse<Attendance>>("attendances", &attendance)
         .await?;
-    
+
     Ok(response.data)
 }
 ```

@@ -3,13 +3,16 @@ use chrono::Local;
 use tracing::{debug, info};
 
 use libtimed::{
-    models::{Attendance, AttendanceAttributes, AttendanceRelationships, FilterParams, RelationshipData, RelationshipResource, ResourceResponse, ResourcesResponse},
+    models::{
+        Attendance, AttendanceAttributes, AttendanceRelationships, FilterParams, RelationshipData,
+        RelationshipResource, ResourceResponse, ResourcesResponse,
+    },
     TimedClient,
 };
 
 /// List attendances for the current user or all users
 pub async fn list_attendances(
-    client: &TimedClient, 
+    client: &TimedClient,
     date_str: Option<&str>,
     from_str: Option<&str>,
     to_str: Option<&str>,
@@ -17,7 +20,7 @@ pub async fn list_attendances(
 ) -> Result<()> {
     // Create filter for attendances
     let mut filter = FilterParams::default();
-    
+
     // Handle date filtering with priority: specific date > date range > today
     if let Some(date) = date_str {
         // Specific date has highest priority
@@ -39,25 +42,25 @@ pub async fn list_attendances(
         debug!("Getting attendances for today: {}", today);
         filter.date = Some(today);
     }
-    
+
     // Add user filter unless all_users flag is set
     if !all_users {
         // Get current user ID from /users/me endpoint
         let current_user_response = client.get::<serde_json::Value>("users/me", None).await?;
-        
+
         if let Some(user_id) = current_user_response["data"]["id"].as_str() {
             debug!("Filtering for current user: {}", user_id);
             filter.user = Some(user_id.to_string());
         }
     }
-    
+
     // Include related entities for better display
     filter.include = Some("user".to_string());
-    
+
     let response = client
         .get::<ResourcesResponse<Attendance>>("attendances", Some(&filter))
         .await?;
-    
+
     if response.data.is_empty() {
         if date_str.is_some() {
             println!("No attendances found for date: {}", date_str.unwrap());
@@ -70,7 +73,7 @@ pub async fn list_attendances(
         }
         return Ok(());
     }
-    
+
     // Display date range in the header
     if date_str.is_some() {
         println!("Attendances for {}", date_str.unwrap());
@@ -82,41 +85,49 @@ pub async fn list_attendances(
         let today = Local::now().date_naive().format("%Y-%m-%d");
         println!("Attendances for {}", today);
     }
-    
+
     println!("----------------------------------------");
-    
+
     // Get included data
     let included = response.included.unwrap_or_default();
-    
+
     // Display each attendance
     for attendance in response.data {
         let date = attendance.attributes.date;
         let from_time = attendance.attributes.from_time;
-        let to_time = attendance.attributes.to_time.unwrap_or_else(|| "-".to_string());
-        
+        let to_time = attendance
+            .attributes
+            .to_time
+            .unwrap_or_else(|| "-".to_string());
+
         // Get user info if we're showing all users
         let mut user_prefix = "".to_string();
         if all_users {
             if let Some(user_rel) = &attendance.relationships.user {
                 if let Some(user_res) = &user_rel.data {
                     let user_id = &user_res.id;
-                    
+
                     // Find user in included data
-                    if let Some(user) = included.iter().find(|inc| {
-                        inc.type_name == "users" && inc.id == *user_id
-                    }) {
-                        if let Some(username) = user.attributes.get("username").and_then(|n| n.as_str()) {
+                    if let Some(user) = included
+                        .iter()
+                        .find(|inc| inc.type_name == "users" && inc.id == *user_id)
+                    {
+                        if let Some(username) =
+                            user.attributes.get("username").and_then(|n| n.as_str())
+                        {
                             user_prefix = format!("[{}] ", username);
                         }
                     }
                 }
             }
         }
-        
-        println!("{}Date: {} | From: {} | To: {}", 
-                 user_prefix, date, from_time, to_time);
+
+        println!(
+            "{}Date: {} | From: {} | To: {}",
+            user_prefix, date, from_time, to_time
+        );
     }
-    
+
     Ok(())
 }
 
@@ -132,7 +143,7 @@ pub async fn create_attendance(
     let user_id = current_user_response["data"]["id"]
         .as_str()
         .ok_or_else(|| anyhow::anyhow!("Failed to get user ID"))?;
-    
+
     // Create attendance
     let attendance = Attendance {
         id: None,
@@ -151,22 +162,27 @@ pub async fn create_attendance(
             }),
         },
     };
-    
+
     // Post to API
     let request_body = serde_json::json!({
         "data": attendance
     });
-    
+
     let response = client
         .post::<_, ResourceResponse<Attendance>>("attendances", &request_body)
         .await?;
-    
-    info!("Created attendance for {} with ID: {:?}", date_str, response.data.id);
-    println!("Created attendance for {} from {} to {}", 
-             date_str, 
-             from_time, 
-             to_time.unwrap_or("now"));
-    
+
+    info!(
+        "Created attendance for {} with ID: {:?}",
+        date_str, response.data.id
+    );
+    println!(
+        "Created attendance for {} from {} to {}",
+        date_str,
+        from_time,
+        to_time.unwrap_or("now")
+    );
+
     Ok(())
 }
 
@@ -183,31 +199,37 @@ pub async fn update_attendance(
     let current = client
         .get::<ResourceResponse<Attendance>>(&endpoint, None)
         .await?;
-    
+
     // Update with new values or keep existing ones
     let attendance = Attendance {
         id: Some(attendance_id.to_string()),
         type_name: "attendances".to_string(),
         attributes: AttendanceAttributes {
-            date: date_str.map(|s| s.to_string()).unwrap_or(current.data.attributes.date),
-            from_time: from_time.map(|s| s.to_string()).unwrap_or(current.data.attributes.from_time),
-            to_time: to_time.map(|s| s.to_string()).or(current.data.attributes.to_time),
+            date: date_str
+                .map(|s| s.to_string())
+                .unwrap_or(current.data.attributes.date),
+            from_time: from_time
+                .map(|s| s.to_string())
+                .unwrap_or(current.data.attributes.from_time),
+            to_time: to_time
+                .map(|s| s.to_string())
+                .or(current.data.attributes.to_time),
         },
         relationships: current.data.relationships,
     };
-    
+
     // Patch to API
     let request_body = serde_json::json!({
         "data": attendance
     });
-    
+
     let response = client
         .patch::<_, ResourceResponse<Attendance>>(&endpoint, &request_body)
         .await?;
-    
+
     info!("Updated attendance with ID: {}", attendance_id);
     println!("Updated attendance");
-    
+
     Ok(())
 }
 
@@ -215,9 +237,9 @@ pub async fn update_attendance(
 pub async fn delete_attendance(client: &TimedClient, attendance_id: &str) -> Result<()> {
     let endpoint = format!("attendances/{}", attendance_id);
     client.delete(&endpoint).await?;
-    
+
     info!("Deleted attendance with ID: {}", attendance_id);
     println!("Deleted attendance");
-    
+
     Ok(())
 }

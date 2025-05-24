@@ -22,7 +22,7 @@ mod tests {
                 }),
             },
         };
-        
+
         let json = serde_json::to_string(&attendance).unwrap();
         assert!(json.contains("attendances"));
         assert!(json.contains("2023-08-15"));
@@ -56,7 +56,7 @@ mod tests {
                 }),
             },
         };
-        
+
         let json = serde_json::to_string(&absence).unwrap();
         assert!(json.contains("absences"));
         assert!(json.contains("2023-08-15"));
@@ -77,7 +77,7 @@ mod tests {
                 fill_worktime: true,
             },
         };
-        
+
         let json = serde_json::to_string(&absence_type).unwrap();
         assert!(json.contains("absence-types"));
         assert!(json.contains("Vacation"));
@@ -103,7 +103,7 @@ mod tests {
                 }),
             },
         };
-        
+
         let json = serde_json::to_string(&year_statistic).unwrap();
         assert!(json.contains("year-statistics"));
         assert!(json.contains("2023"));
@@ -133,7 +133,7 @@ mod tests {
                 }),
             },
         };
-        
+
         let json = serde_json::to_string(&month_statistic).unwrap();
         assert!(json.contains("month-statistics"));
         assert!(json.contains("2023"));
@@ -165,9 +165,9 @@ mod tests {
                 map
             },
         };
-        
+
         let json = serde_json::to_value(&filter).unwrap();
-        
+
         assert_eq!(json["date"], "2023-08-15");
         assert_eq!(json["from_date"], "2023-08-01");
         assert_eq!(json["to_date"], "2023-08-31");

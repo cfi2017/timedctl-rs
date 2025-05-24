@@ -188,3 +188,11 @@ To begin implementation:
 3. Design button layouts and icons
 4. Create a prototype implementation
 5. Test with real workflows and iterate
+
+Some extra ideas for streamdeck integration:
+- Show all activities of previous day on a deck page for easy resuming
+- Show all activities of today for easy resuming
+
+Focus the streamdeck stuff on context switching. Obviously adding new tasks is less ideal, maybe you have some ideas?
+
+Still only conceptualising, no implementation.

@@ -8,7 +8,7 @@ use serde_json::Value;
 pub trait Model {
     /// Get the resource name for this model
     fn resource_name() -> &'static str;
-    
+
     /// Get the endpoint URL for this model
     fn endpoint_url(client: &TimedClient) -> String {
         format!("{}{}", client.base_url(), Self::resource_name())
@@ -21,51 +21,51 @@ pub struct FilterParams {
     /// Filter by specific date (field name depends on the endpoint: 'date' or 'day')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub date: Option<String>,
-    
+
     /// Filter by start date - inclusive (greater than or equal)
     #[serde(rename = "from_date", skip_serializing_if = "Option::is_none")]
     pub from_date: Option<String>,
-    
+
     /// Filter by end date - inclusive (less than or equal)
     #[serde(rename = "to_date", skip_serializing_if = "Option::is_none")]
     pub to_date: Option<String>,
-    
+
     /// Filter by archived status (0 = not archived, 1 = archived, null = both)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub archived: Option<i32>,
-    
+
     /// Filter by active status (for activities)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active: Option<i32>,
-    
-    /// Filter by user ID 
+
+    /// Filter by user ID
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<String>,
-    
+
     /// Filter by review status
     #[serde(skip_serializing_if = "Option::is_none")]
     pub review: Option<i32>,
-    
+
     /// Filter by billable status
     #[serde(rename = "not_billable", skip_serializing_if = "Option::is_none")]
     pub not_billable: Option<i32>,
-    
+
     /// Filter by task ID
     #[serde(skip_serializing_if = "Option::is_none")]
     pub task: Option<String>,
-    
+
     /// Filter by project ID
     #[serde(skip_serializing_if = "Option::is_none")]
     pub project: Option<String>,
-    
+
     /// Filter by customer ID
     #[serde(skip_serializing_if = "Option::is_none")]
     pub customer: Option<String>,
-    
+
     /// Include related resources in the response
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include: Option<String>,
-    
+
     /// Additional custom parameters that aren't covered by the common ones
     #[serde(flatten)]
     pub custom: HashMap<String, String>,
@@ -580,7 +580,7 @@ impl Model for WorkReport {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_model_resource_names() {
         assert_eq!(User::resource_name(), "users");
@@ -601,7 +601,7 @@ mod tests {
         assert_eq!(CustomerStatistic::resource_name(), "customer-statistics");
         assert_eq!(WorkReport::resource_name(), "work-reports");
     }
-    
+
     #[test]
     fn test_serialize_activity() {
         let activity = Activity {
@@ -630,7 +630,7 @@ mod tests {
                 }),
             },
         };
-        
+
         let json = serde_json::to_string(&activity).unwrap();
         assert!(json.contains("activities"));
         assert!(json.contains("Working on something"));

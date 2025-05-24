@@ -133,11 +133,27 @@ cargo build
 cargo test
 ```
 
-### Linting
+### Linting and Formatting
 
 ```bash
+# Run clippy for linting
 cargo clippy
+
+# Format code
+cargo fmt
 ```
+
+### Pre-commit Hooks
+
+This project uses pre-commit hooks to ensure code quality. To use them:
+
+1. Install pre-commit: [pre-commit.com](https://pre-commit.com/#install)
+2. Set up the git hooks: `pre-commit install`
+
+The pre-commit hooks will automatically:
+- Format Rust code with `cargo fmt`
+- Run linting with `cargo clippy`
+- Fix trailing whitespace and file endings
 
 ### CI/CD Pipeline
 

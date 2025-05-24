@@ -1,16 +1,18 @@
+use libtimed::{models::*, Result, TimedClient};
 use mockito::{self, Server};
-use libtimed::{models::*, TimedClient, Result};
 use serde_json::json;
 
 fn test_client_get_users() -> Result<()> {
     let mut rt = tokio::runtime::Runtime::new().unwrap();
     let mut server = Server::new();
-    
+
     // Mock the users endpoint
-    let mock = server.mock("GET", "/api/v1/users/me")
+    let mock = server
+        .mock("GET", "/api/v1/users/me")
         .with_status(200)
         .with_header("content-type", "application/json")
-        .with_body(r#"{
+        .with_body(
+            r#"{
             "data": {
                 "id": "123",
                 "type": "users",
@@ -21,39 +23,38 @@ fn test_client_get_users() -> Result<()> {
                     "last-name": "User"
                 }
             }
-        }"#)
+        }"#,
+        )
         .create();
-    
+
     // Create client with the mock server URL
-    let client = TimedClient::new(
-        &server.url(),
-        "api/v1",
-        Some("mock-token".to_string())
-    );
-    
+    let client = TimedClient::new(&server.url(), "api/v1", Some("mock-token".to_string()));
+
     // Call the API
     let response = rt.block_on(client.get::<serde_json::Value>("users/me", None))?;
-    
+
     // Verify the response
     assert_eq!(response["data"]["id"], "123");
     assert_eq!(response["data"]["attributes"]["username"], "testuser");
-    
+
     // Verify the mock was called
     mock.assert();
-    
+
     Ok(())
 }
 
 fn test_client_get_activities() -> Result<()> {
     let mut rt = tokio::runtime::Runtime::new().unwrap();
     let mut server = Server::new();
-    
+
     // Mock the activities endpoint
-    let mock = server.mock("GET", "/api/v1/activities")
+    let mock = server
+        .mock("GET", "/api/v1/activities")
         .match_query(mockito::Matcher::Any)
         .with_status(200)
         .with_header("content-type", "application/json")
-        .with_body(r#"{
+        .with_body(
+            r#"{
             "data": [
                 {
                     "id": "123",
@@ -82,45 +83,45 @@ fn test_client_get_activities() -> Result<()> {
                     }
                 }
             ]
-        }"#)
+        }"#,
+        )
         .create();
-    
+
     // Create client with the mock server URL
-    let client = TimedClient::new(
-        &server.url(),
-        "api/v1",
-        Some("mock-token".to_string())
-    );
-    
+    let client = TimedClient::new(&server.url(), "api/v1", Some("mock-token".to_string()));
+
     // Create filter params
     let mut filter = FilterParams::default();
     filter.date = Some("2023-07-15".to_string());
     filter.include = Some("task,user".to_string());
-    
+
     // Call the API
-    let response = rt.block_on(client.get::<ResourcesResponse<Activity>>("activities", Some(&filter)))?;
-    
+    let response =
+        rt.block_on(client.get::<ResourcesResponse<Activity>>("activities", Some(&filter)))?;
+
     // Verify the response
     assert_eq!(response.data.len(), 1);
     assert_eq!(response.data[0].id, Some("123".to_string()));
     assert_eq!(response.data[0].attributes.comment, "Working on something");
     assert_eq!(response.data[0].attributes.date, "2023-07-15");
-    
+
     // Verify the mock was called
     mock.assert();
-    
+
     Ok(())
 }
 
 fn test_client_post_activity() -> Result<()> {
     let mut rt = tokio::runtime::Runtime::new().unwrap();
     let mut server = Server::new();
-    
+
     // Mock the activities endpoint for POST
-    let mock = server.mock("POST", "/api/v1/activities")
+    let mock = server
+        .mock("POST", "/api/v1/activities")
         .with_status(201)
         .with_header("content-type", "application/json")
-        .with_body(r#"{
+        .with_body(
+            r#"{
             "data": {
                 "id": "999",
                 "type": "activities",
@@ -147,16 +148,13 @@ fn test_client_post_activity() -> Result<()> {
                     }
                 }
             }
-        }"#)
+        }"#,
+        )
         .create();
-    
+
     // Create client with the mock server URL
-    let client = TimedClient::new(
-        &server.url(),
-        "api/v1",
-        Some("mock-token".to_string())
-    );
-    
+    let client = TimedClient::new(&server.url(), "api/v1", Some("mock-token".to_string()));
+
     // Create new activity
     let activity = Activity {
         id: None,
@@ -184,35 +182,37 @@ fn test_client_post_activity() -> Result<()> {
             }),
         },
     };
-    
+
     let request_body = json!({
         "data": activity
     });
-    
+
     // Call the API
-    let response = rt.block_on(client
-        .post::<_, ResourceResponse<Activity>>("activities", &request_body))?;
-    
+    let response =
+        rt.block_on(client.post::<_, ResourceResponse<Activity>>("activities", &request_body))?;
+
     // Verify the response
     assert_eq!(response.data.id, Some("999".to_string()));
     assert_eq!(response.data.attributes.comment, "New activity");
-    
+
     // Verify the mock was called
     mock.assert();
-    
+
     Ok(())
 }
 
 fn test_client_worktime_balance() -> Result<()> {
     let mut rt = tokio::runtime::Runtime::new().unwrap();
     let mut server = Server::new();
-    
+
     // Mock the worktime-balances endpoint
-    let mock = server.mock("GET", "/api/v1/worktime-balances")
+    let mock = server
+        .mock("GET", "/api/v1/worktime-balances")
         .match_query(mockito::Matcher::Any)
         .with_status(200)
         .with_header("content-type", "application/json")
-        .with_body(r#"{
+        .with_body(
+            r#"{
             "data": [
                 {
                     "id": "123",
@@ -231,31 +231,30 @@ fn test_client_worktime_balance() -> Result<()> {
                     }
                 }
             ]
-        }"#)
+        }"#,
+        )
         .create();
-    
+
     // Create client with the mock server URL
-    let client = TimedClient::new(
-        &server.url(),
-        "api/v1",
-        Some("mock-token".to_string())
-    );
-    
+    let client = TimedClient::new(&server.url(), "api/v1", Some("mock-token".to_string()));
+
     // Create filter params
     let mut filter = FilterParams::default();
     filter.date = Some("2023-07-15".to_string());
-    
+
     // Call the API
-    let response = rt.block_on(client.get::<ResourcesResponse<WorktimeBalance>>("worktime-balances", Some(&filter)))?;
-    
+    let response = rt.block_on(
+        client.get::<ResourcesResponse<WorktimeBalance>>("worktime-balances", Some(&filter)),
+    )?;
+
     // Verify the response
     assert_eq!(response.data.len(), 1);
     assert_eq!(response.data[0].id, Some("123".to_string()));
     assert_eq!(response.data[0].attributes.date, "2023-07-15");
     assert_eq!(response.data[0].attributes.balance, "08:30:00");
-    
+
     // Verify the mock was called
     mock.assert();
-    
+
     Ok(())
 }

@@ -77,23 +77,24 @@ impl AuthClient {
 
     /// Get the OpenID Connect configuration from the discovery URL
     async fn get_openid_configuration(&self) -> Result<OpenIdConfiguration, AuthError> {
-        let discovery_url = format!("{}/.well-known/openid-configuration", self.config.sso_discovery_url);
+        let discovery_url = format!(
+            "{}/.well-known/openid-configuration",
+            self.config.sso_discovery_url
+        );
         debug!("Fetching OpenID configuration from: {}", discovery_url);
 
-        let response = self
-            .client
-            .get(&discovery_url)
-            .send()
-            .await
-            .map_err(|e| {
-                error!("Failed to fetch OpenID configuration: {}", e);
-                AuthError::Http(e)
-            })?;
+        let response = self.client.get(&discovery_url).send().await.map_err(|e| {
+            error!("Failed to fetch OpenID configuration: {}", e);
+            AuthError::Http(e)
+        })?;
 
         if !response.status().is_success() {
             let status = response.status();
             let text = response.text().await.unwrap_or_default();
-            error!("Failed to fetch OpenID configuration, status: {}, body: {}", status, text);
+            error!(
+                "Failed to fetch OpenID configuration, status: {}, body: {}",
+                status, text
+            );
             return Err(AuthError::AuthFailed(format!(
                 "Failed to fetch OpenID configuration: HTTP {}: {}",
                 status, text
@@ -112,7 +113,10 @@ impl AuthClient {
         oidc_config: &OpenIdConfiguration,
     ) -> Result<DeviceAuthResponse, AuthError> {
         let device_auth_url = &oidc_config.device_authorization_endpoint;
-        debug!("Starting device flow authentication at: {}", device_auth_url);
+        debug!(
+            "Starting device flow authentication at: {}",
+            device_auth_url
+        );
 
         let response = self
             .client
@@ -131,7 +135,10 @@ impl AuthClient {
         if !response.status().is_success() {
             let status = response.status();
             let text = response.text().await.unwrap_or_default();
-            error!("Device flow request failed, status: {}, body: {}", status, text);
+            error!(
+                "Device flow request failed, status: {}, body: {}",
+                status, text
+            );
             return Err(AuthError::AuthFailed(format!(
                 "Device flow request failed: HTTP {}: {}",
                 status, text
@@ -272,9 +279,9 @@ impl AuthClient {
         }
 
         // Decode the payload (second part)
-        let payload = URL_SAFE_NO_PAD
-            .decode(parts[1])
-            .map_err(|e| AuthError::TokenDecode(format!("Failed to decode token payload: {}", e)))?;
+        let payload = URL_SAFE_NO_PAD.decode(parts[1]).map_err(|e| {
+            AuthError::TokenDecode(format!("Failed to decode token payload: {}", e))
+        })?;
 
         // Parse the JSON claims
         let claims: TokenClaims =
@@ -364,7 +371,7 @@ impl AuthClient {
                 // Continue anyway since we have a valid token
             }
         }
-        
+
         // Also store refresh token if available
         if let Some(refresh_token) = &token_response.refresh_token {
             match self.config.store_refresh_token(refresh_token) {
@@ -383,45 +390,52 @@ impl AuthClient {
     /// Try to refresh an access token using the refresh token
     async fn refresh_token(&self, refresh_token: &str) -> Result<String, AuthError> {
         debug!("Attempting to refresh token");
-        
+
         // Get OpenID configuration to get token endpoint
         let oidc_config = self.get_openid_configuration().await?;
         let token_url = oidc_config.token_endpoint;
-        
+
         let params = [
             ("grant_type", "refresh_token"),
             ("client_id", &self.config.sso_client_id),
             ("refresh_token", refresh_token),
         ];
-        
+
         let client = reqwest::Client::new();
         let response = client
             .post(&token_url)
             .form(&params)
             .send()
             .await
-            .map_err(|e| AuthError::Http(e))?;
-            
+            .map_err(AuthError::Http)?;
+
         if !response.status().is_success() {
             let status = response.status();
             let text = response.text().await.unwrap_or_default();
             warn!("Token refresh failed with status {}: {}", status, text);
-            return Err(AuthError::AuthFailed(format!("Token refresh failed: {}", text)));
+            return Err(AuthError::AuthFailed(format!(
+                "Token refresh failed: {}",
+                text
+            )));
         }
-        
-        let token_response: TokenResponse = response.json().await
+
+        let token_response: TokenResponse = response
+            .json()
+            .await
             .map_err(|e| AuthError::TokenDecode(e.to_string()))?;
-            
+
         // Store the new token
-        self.config.store_token(&token_response.access_token)
+        self.config
+            .store_token(&token_response.access_token)
             .map_err(|e| AuthError::AuthFailed(format!("Failed to store token: {}", e)))?;
-            
+
         // Also store the refresh token if we got a new one
         if let Some(refresh) = &token_response.refresh_token {
-            self.config.store_refresh_token(refresh)
-                .map_err(|e| AuthError::AuthFailed(format!("Failed to store refresh token: {}", e)))?;
+            self.config.store_refresh_token(refresh).map_err(|e| {
+                AuthError::AuthFailed(format!("Failed to store refresh token: {}", e))
+            })?;
         }
-        
+
         info!("Successfully refreshed access token");
         Ok(token_response.access_token)
     }
@@ -447,16 +461,19 @@ impl AuthClient {
         // Check if the token is expired
         if self.is_token_expired(&token) {
             info!("Authentication token has expired");
-            
+
             // Try to use refresh token if available
             if let Ok(refresh_token) = self.config.get_refresh_token() {
                 match self.refresh_token(&refresh_token).await {
                     Ok(new_token) => {
                         debug!("Successfully refreshed token");
                         return Ok(new_token);
-                    },
+                    }
                     Err(e) => {
-                        warn!("Failed to refresh token: {}, starting new authentication flow", e);
+                        warn!(
+                            "Failed to refresh token: {}, starting new authentication flow",
+                            e
+                        );
                         return self.authenticate().await;
                     }
                 }
@@ -469,7 +486,7 @@ impl AuthClient {
         debug!("Using existing valid authentication token");
         Ok(token)
     }
-    
+
     /// Force renewal of the authentication token
     pub async fn force_renew_token(&self) -> Result<String, AuthError> {
         info!("Forcing token renewal");

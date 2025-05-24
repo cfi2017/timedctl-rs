@@ -6,12 +6,12 @@ use libtimed::{
     TimedClient,
 };
 
-pub mod activity;
-pub mod report;
-pub mod data;
-pub mod config;
-pub mod attendance;
 pub mod absence;
+pub mod activity;
+pub mod attendance;
+pub mod config;
+pub mod data;
+pub mod report;
 pub mod statistics;
 
 /// Parse a date string or return today's date
@@ -47,34 +47,36 @@ pub fn format_duration(duration_str: &str) -> Result<String> {
 /// Get the current user
 pub async fn get_current_user(client: &TimedClient) -> Result<User> {
     let filter = FilterParams::default();
-    let response = client.get::<serde_json::Value>("users/me", Some(&filter)).await?;
-    
+    let response = client
+        .get::<serde_json::Value>("users/me", Some(&filter))
+        .await?;
+
     let user = serde_json::from_value::<User>(response["data"].clone())?;
     Ok(user)
 }
 
 /// Get overtime for a specific date
-pub async fn get_overtime(
-    client: &TimedClient, 
-    date_str: Option<&str>
-) -> Result<String> {
+pub async fn get_overtime(client: &TimedClient, date_str: Option<&str>) -> Result<String> {
     let date = parse_date(date_str)?;
-    
+
     let mut filter = FilterParams::default();
     filter.date = Some(date.format("%Y-%m-%d").to_string());
-    
+
     let response = client
         .get::<serde_json::Value>("worktime-balances", Some(&filter))
         .await?;
-    
+
     if let Some(data) = response["data"].as_array() {
         if let Some(balance) = data.first() {
-            let balance_str = balance["attributes"]["balance"].as_str()
+            let balance_str = balance["attributes"]["balance"]
+                .as_str()
                 .ok_or_else(|| anyhow::anyhow!("Invalid balance format"))?;
-            
+
             return Ok(balance_str.to_string());
         }
     }
-    
-    Err(anyhow::anyhow!("No overtime data found for the specified date"))
+
+    Err(anyhow::anyhow!(
+        "No overtime data found for the specified date"
+    ))
 }

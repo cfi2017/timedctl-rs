@@ -17,8 +17,8 @@ pub async fn start_activity(
     start_time: Option<&str>,
     interactive: bool,
 ) -> Result<()> {
-    use dialoguer::{Input, FuzzySelect, theme::ColorfulTheme};
-    
+    use dialoguer::{theme::ColorfulTheme, FuzzySelect, Input};
+
     // If there's an active activity, stop it first
     stop_activity(client).await?;
 
@@ -64,12 +64,14 @@ pub async fn start_activity(
         } else if let Ok(time) = NaiveTime::parse_from_str(time_str, "%H:%M:%S") {
             time
         } else {
-            return Err(anyhow::anyhow!("Invalid time format. Use HH:MM or HH:MM:SS"));
+            return Err(anyhow::anyhow!(
+                "Invalid time format. Use HH:MM or HH:MM:SS"
+            ));
         }
     } else if interactive {
         // Default to current time
         let now = Local::now().time();
-        
+
         // Ask if user wants to use current time or specify a different time
         let options = vec!["Current time", "Specify start time"];
         let selection = FuzzySelect::with_theme(&ColorfulTheme::default())
@@ -77,7 +79,7 @@ pub async fn start_activity(
             .default(0)
             .items(&options)
             .interact()?;
-            
+
         if selection == 0 {
             now
         } else {
@@ -93,7 +95,7 @@ pub async fn start_activity(
                     }
                 })
                 .interact_text()?;
-                
+
             NaiveTime::parse_from_str(&time_input, "%H:%M")?
         }
     } else {
@@ -128,7 +130,12 @@ pub async fn start_activity(
         .post::<_, serde_json::Value>("activities", &activity)
         .await?;
 
-    info!("Activity started: {} at {:02}:{:02}", activity_comment, start.hour(), start.minute());
+    info!(
+        "Activity started: {} at {:02}:{:02}",
+        activity_comment,
+        start.hour(),
+        start.minute()
+    );
     Ok(())
 }
 
@@ -759,8 +766,8 @@ pub async fn generate_timesheet(client: &TimedClient) -> Result<()> {
 
 /// Interactive function to select task
 async fn interactive_select_task(client: &TimedClient, show_archived: bool) -> Result<String> {
-    use dialoguer::{FuzzySelect, theme::ColorfulTheme};
-    
+    use dialoguer::{theme::ColorfulTheme, FuzzySelect};
+
     // Get customers
     let mut filter = FilterParams::default();
     if !show_archived {

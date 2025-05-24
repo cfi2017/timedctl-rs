@@ -1,4 +1,3 @@
-use serde_json::json;
 use libtimed::models::*;
 use std::collections::HashMap;
 
@@ -42,7 +41,7 @@ fn test_attendance_serialization() {
             }),
         },
     };
-    
+
     let json = serde_json::to_string(&attendance).unwrap();
     assert!(json.contains("attendances"));
     assert!(json.contains("2023-08-15"));
@@ -50,13 +49,19 @@ fn test_attendance_serialization() {
     assert!(json.contains("17:00:00"));
     assert!(json.contains("users"));
     assert!(json.contains("456"));
-    
+
     // Test deserialization
     let deserialized: Attendance = serde_json::from_str(&json).unwrap();
     assert_eq!(deserialized.id, attendance.id);
     assert_eq!(deserialized.attributes.date, attendance.attributes.date);
-    assert_eq!(deserialized.attributes.from_time, attendance.attributes.from_time);
-    assert_eq!(deserialized.attributes.to_time, attendance.attributes.to_time);
+    assert_eq!(
+        deserialized.attributes.from_time,
+        attendance.attributes.from_time
+    );
+    assert_eq!(
+        deserialized.attributes.to_time,
+        attendance.attributes.to_time
+    );
 }
 
 #[test]
@@ -83,7 +88,7 @@ fn test_absence_serialization() {
             }),
         },
     };
-    
+
     let json = serde_json::to_string(&absence).unwrap();
     assert!(json.contains("absences"));
     assert!(json.contains("2023-08-15"));
@@ -92,7 +97,7 @@ fn test_absence_serialization() {
     assert!(json.contains("456"));
     assert!(json.contains("absence-types"));
     assert!(json.contains("789"));
-    
+
     // Test deserialization
     let deserialized: Absence = serde_json::from_str(&json).unwrap();
     assert_eq!(deserialized.id, absence.id);
@@ -119,13 +124,13 @@ fn test_statistics_models() {
             }),
         },
     };
-    
+
     let json = serde_json::to_string(&year_statistic).unwrap();
     assert!(json.contains("year-statistics"));
     assert!(json.contains("2023"));
     assert!(json.contains("2000:00:00"));
     assert!(json.contains("2100:00:00"));
-    
+
     // Test month statistics
     let month_statistic = MonthStatistic {
         id: Some("123".to_string()),
@@ -145,7 +150,7 @@ fn test_statistics_models() {
             }),
         },
     };
-    
+
     let json = serde_json::to_string(&month_statistic).unwrap();
     assert!(json.contains("month-statistics"));
     assert!(json.contains("2023"));
@@ -174,9 +179,9 @@ fn test_filter_params() {
             map
         },
     };
-    
+
     let json = serde_json::to_value(&filter).unwrap();
-    
+
     assert_eq!(json["date"], "2023-08-15");
     assert_eq!(json["from_date"], "2023-08-01");
     assert_eq!(json["to_date"], "2023-08-31");
@@ -253,7 +258,7 @@ fn test_resources_response() {
             }
         ]
     }"#;
-    
+
     let response: ResourcesResponse<Activity> = serde_json::from_str(json_str).unwrap();
     assert_eq!(response.data.len(), 1);
     assert_eq!(response.data[0].id, Some("123".to_string()));
