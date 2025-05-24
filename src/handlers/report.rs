@@ -65,10 +65,10 @@ async fn get_reports_with_options(client: &TimedClient, options: GetReportsOptio
     };
 
     // Get reports for the date
-    let mut filter = FilterParams::default();
-
-    // Include task relationships for proper display
-    filter.include = Some("task,task.project,task.project.customer,user".to_string());
+    let mut filter = FilterParams {
+        include: Some("task,task.project,task.project.customer,user".to_string()),
+        ..Default::default()
+    };
 
     // Handle date filtering with priority: specific date > date range > today
     if let Some(ref date) = date_param {
@@ -141,12 +141,6 @@ async fn get_reports_with_options(client: &TimedClient, options: GetReportsOptio
             let duration = report["attributes"]["duration"]
                 .as_str()
                 .unwrap_or("00:00:00");
-            let review = report["attributes"]["review"].as_bool().unwrap_or(false);
-            let not_billable = report["attributes"]["not-billable"]
-                .as_bool()
-                .unwrap_or(false);
-            let verified = report["attributes"]["verified"].as_bool().unwrap_or(false);
-            let rejected = report["attributes"]["rejected"].as_bool().unwrap_or(false);
             let review = report["attributes"]["review"].as_bool().unwrap_or(false);
             let not_billable = report["attributes"]["not-billable"]
                 .as_bool()
@@ -227,7 +221,7 @@ async fn get_reports_with_options(client: &TimedClient, options: GetReportsOptio
                 flags.push("REJECTED");
             }
 
-            let flags_str = if !flags.is_empty() {
+            let _flags_str = if !flags.is_empty() {
                 format!(" [{}]", flags.join(", "))
             } else {
                 "".to_string()
@@ -247,7 +241,7 @@ async fn get_reports_with_options(client: &TimedClient, options: GetReportsOptio
                 flags.push("REJECTED");
             }
 
-            let flags_str = if !flags.is_empty() {
+            let _flags_str = if !flags.is_empty() {
                 format!(" [{}]", flags.join(", "))
             } else {
                 "".to_string()
@@ -353,6 +347,7 @@ async fn interactive_date_selection() -> Result<(Option<String>, Option<String>,
 }
 
 /// Get intersection of common values among reports that match a filter
+#[allow(dead_code)]
 pub async fn get_report_intersection(
     client: &TimedClient,
     filter_params: FilterParams,
@@ -426,6 +421,7 @@ pub async fn get_report_intersection(
 }
 
 /// Bulk update reports based on a filter
+#[allow(dead_code)]
 pub async fn bulk_update_reports(
     client: &TimedClient,
     filter_params: FilterParams,
@@ -482,7 +478,7 @@ pub async fn bulk_update_reports(
     });
 
     // Make the request
-    let response = client
+    let _response = client
         .post::<_, serde_json::Value>("reports/bulk", &bulk_request)
         .await?;
 
@@ -492,6 +488,7 @@ pub async fn bulk_update_reports(
 }
 
 /// Export reports based on a filter
+#[allow(dead_code)]
 pub async fn export_reports(
     client: &TimedClient,
     filter_params: FilterParams,
@@ -548,6 +545,7 @@ pub async fn export_reports(
 }
 
 /// Add a new report
+#[allow(clippy::too_many_arguments)]
 pub async fn add_report(
     client: &TimedClient,
     customer: Option<&str>,
@@ -742,9 +740,11 @@ pub async fn delete_report(
     };
 
     // Get reports for the date
-    let mut filter = FilterParams::default();
-    filter.date = Some(date.format("%Y-%m-%d").to_string());
-    filter.include = Some("task,task.project,task.project.customer,user".to_string());
+    let mut filter = FilterParams {
+        date: Some(date.format("%Y-%m-%d").to_string()),
+        include: Some("task,task.project,task.project.customer,user".to_string()),
+        ..Default::default()
+    };
 
     // Add user filter unless all_users flag is set
     if !all_users {
@@ -1008,9 +1008,11 @@ pub async fn edit_report(
     };
 
     // Get reports for the date
-    let mut filter = FilterParams::default();
-    filter.date = Some(date.format("%Y-%m-%d").to_string());
-    filter.include = Some("task,task.project,task.project.customer".to_string());
+    let filter = FilterParams {
+        date: Some(date.format("%Y-%m-%d").to_string()),
+        include: Some("task,task.project,task.project.customer".to_string()),
+        ..Default::default()
+    };
 
     let response = client
         .get::<serde_json::Value>("reports", Some(&filter))

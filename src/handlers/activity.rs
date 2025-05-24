@@ -7,6 +7,7 @@ use libtimed::{models::FilterParams, TimedClient};
 use super::parse_date;
 
 /// Start a new activity
+#[allow(clippy::too_many_arguments)]
 pub async fn start_activity(
     client: &TimedClient,
     comment: &str,
@@ -186,7 +187,7 @@ pub async fn stop_activity(client: &TimedClient) -> Result<()> {
 /// Show information about activities within a date range
 pub async fn show_activity(
     client: &TimedClient,
-    short: bool,
+    _short: bool,
     date_str: Option<&str>,
     from_str: Option<&str>,
     to_str: Option<&str>,
@@ -438,7 +439,7 @@ pub async fn get_active_activity(client: &TimedClient, short: bool) -> Result<()
 
         // Find task/project/customer info
         if let Some(task_data) = activity["relationships"]["task"]["data"].as_object() {
-            if let (Some(task_type), Some(task_id)) =
+            if let (Some(_task_type), Some(task_id)) =
                 (task_data["type"].as_str(), task_data["id"].as_str())
             {
                 if let Some(included) = response["included"].as_array() {
@@ -515,9 +516,11 @@ pub async fn restart_activity(client: &TimedClient, date_str: Option<&str>) -> R
     let date = parse_date(date_str)?;
 
     // Get activities for the date
-    let mut filter = FilterParams::default();
-    filter.date = Some(date.format("%Y-%m-%d").to_string());
-    filter.include = Some("task".to_string());
+    let filter = FilterParams {
+        date: Some(date.format("%Y-%m-%d").to_string()),
+        include: Some("task".to_string()),
+        ..Default::default()
+    };
 
     let response = client
         .get::<serde_json::Value>("activities", Some(&filter))
@@ -600,8 +603,10 @@ pub async fn delete_activity(client: &TimedClient, date_str: Option<&str>) -> Re
     let date = parse_date(date_str)?;
 
     // Get activities for the date
-    let mut filter = FilterParams::default();
-    filter.date = Some(date.format("%Y-%m-%d").to_string());
+    let filter = FilterParams {
+        date: Some(date.format("%Y-%m-%d").to_string()),
+        ..Default::default()
+    };
 
     let response = client
         .get::<serde_json::Value>("activities", Some(&filter))
@@ -661,9 +666,11 @@ pub async fn generate_timesheet(client: &TimedClient) -> Result<()> {
     let today = Local::now().date_naive();
 
     // Get activities for today
-    let mut filter = FilterParams::default();
-    filter.date = Some(today.format("%Y-%m-%d").to_string());
-    filter.include = Some("task,task.project,task.project.customer".to_string());
+    let filter = FilterParams {
+        date: Some(today.format("%Y-%m-%d").to_string()),
+        include: Some("task,task.project,task.project.customer".to_string()),
+        ..Default::default()
+    };
 
     let response = client
         .get::<serde_json::Value>("activities", Some(&filter))

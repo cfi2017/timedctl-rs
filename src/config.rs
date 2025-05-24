@@ -168,6 +168,7 @@ impl TimedConfig {
     }
 
     /// Check if a refresh token exists in the keyring
+    #[allow(dead_code)]
     pub fn has_refresh_token(&self) -> bool {
         let entry = Entry::new(format!("{}_refresh", APP_NAME).as_str(), &self.username).ok();
         if let Some(entry) = entry {

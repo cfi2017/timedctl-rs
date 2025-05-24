@@ -11,6 +11,7 @@ use libtimed::{
 };
 
 /// List attendances for the current user or all users
+#[allow(dead_code)]
 pub async fn list_attendances(
     client: &TimedClient,
     date_str: Option<&str>,
@@ -61,6 +62,7 @@ pub async fn list_attendances(
         .get::<ResourcesResponse<Attendance>>("attendances", Some(&filter))
         .await?;
 
+    // Display results
     if response.data.is_empty() {
         if date_str.is_some() {
             println!("No attendances found for date: {}", date_str.unwrap());
@@ -132,6 +134,7 @@ pub async fn list_attendances(
 }
 
 /// Create a new attendance for the current user
+#[allow(dead_code)]
 pub async fn create_attendance(
     client: &TimedClient,
     date_str: &str,
@@ -186,7 +189,8 @@ pub async fn create_attendance(
     Ok(())
 }
 
-/// Update an existing attendance
+/// Update an existing attendance record
+#[allow(dead_code)]
 pub async fn update_attendance(
     client: &TimedClient,
     attendance_id: &str,
@@ -223,7 +227,7 @@ pub async fn update_attendance(
         "data": attendance
     });
 
-    let response = client
+    let _response = client
         .patch::<_, ResourceResponse<Attendance>>(&endpoint, &request_body)
         .await?;
 
@@ -233,7 +237,8 @@ pub async fn update_attendance(
     Ok(())
 }
 
-/// Delete an attendance by ID
+/// Delete an attendance record by ID
+#[allow(dead_code)]
 pub async fn delete_attendance(client: &TimedClient, attendance_id: &str) -> Result<()> {
     let endpoint = format!("attendances/{}", attendance_id);
     client.delete(&endpoint).await?;

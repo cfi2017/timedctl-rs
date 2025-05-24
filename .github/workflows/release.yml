@@ -8,6 +8,9 @@ on:
       - 'LICENSE'
       - '.gitignore'
 
+permissions:
+  contents: write
+
 env:
   CARGO_TERM_COLOR: always
 
@@ -16,35 +19,23 @@ jobs:
     name: Semantic Release
     runs-on: ubuntu-latest
     outputs:
-      released: ${{ steps.semantic.outputs.released }}
+      released: ${{ steps.semantic.outputs.version != '' }}
       version: ${{ steps.semantic.outputs.version }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.21'
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Install go-semantic-release
-        run: go install github.com/go-semantic-release/semantic-release/v2@latest
-
-      - name: Install cargo-bump
-        run: cargo install cargo-bump
-
-      - name: Build release
-        run: cargo build --release
-
-      - name: Semantic Release
+      - name: Run Semantic Release
         id: semantic
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          semantic-release -vf
-          echo "released=${{ steps.semantic.outputs.released }}" >> $GITHUB_OUTPUT
-          echo "version=${{ steps.semantic.outputs.version }}" >> $GITHUB_OUTPUT
+        uses: go-semantic-release/action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          update-file: Cargo.toml
+          changelog-file: CHANGELOG.md
 
   build-and-upload:
     name: Build and Upload Release Assets
@@ -76,9 +67,7 @@ jobs:
             asset_name: timedctl-windows-amd64.exe
 
     steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: v${{ needs.release.outputs.version }}
+      - uses: actions/checkout@v4
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -95,8 +84,11 @@ jobs:
         run: cargo build --release --target ${{ matrix.target }}
 
       - name: Upload Release Asset
-        uses: go-semantic-release/upload-assets-action@v1
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
-          name: ${{ matrix.asset_name }}
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
+          asset_name: ${{ matrix.asset_name }}
+          asset_content_type: application/octet-stream

@@ -29,6 +29,7 @@ pub fn parse_date(date_str: Option<&str>) -> Result<NaiveDate> {
 }
 
 /// Format a duration in hours and minutes
+#[allow(dead_code)]
 pub fn format_duration(duration_str: &str) -> Result<String> {
     // Check if it's already in HH:MM format
     if duration_str.contains(':') {
@@ -45,6 +46,7 @@ pub fn format_duration(duration_str: &str) -> Result<String> {
 }
 
 /// Get the current user
+#[allow(dead_code)]
 pub async fn get_current_user(client: &TimedClient) -> Result<User> {
     let filter = FilterParams::default();
     let response = client
@@ -59,8 +61,10 @@ pub async fn get_current_user(client: &TimedClient) -> Result<User> {
 pub async fn get_overtime(client: &TimedClient, date_str: Option<&str>) -> Result<String> {
     let date = parse_date(date_str)?;
 
-    let mut filter = FilterParams::default();
-    filter.date = Some(date.format("%Y-%m-%d").to_string());
+    let filter = FilterParams {
+        date: Some(date.format("%Y-%m-%d").to_string()),
+        ..Default::default()
+    };
 
     let response = client
         .get::<serde_json::Value>("worktime-balances", Some(&filter))

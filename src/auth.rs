@@ -19,6 +19,7 @@ pub enum AuthError {
     TokenDecode(String),
 
     #[error("Failed to open browser: {0}")]
+    #[allow(dead_code)]
     Browser(String),
 
     #[error("Authentication failed: {0}")]
@@ -44,19 +45,24 @@ struct DeviceAuthResponse {
     interval: Option<u64>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, serde::Deserialize)]
 struct TokenResponse {
     access_token: String,
     refresh_token: Option<String>,
+    #[allow(dead_code)]
     id_token: Option<String>,
+    #[allow(dead_code)]
     expires_in: u64,
+    #[allow(dead_code)]
     token_type: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, serde::Deserialize)]
 struct TokenClaims {
     exp: u64,
+    #[allow(dead_code)]
     sub: String,
+    #[allow(dead_code)]
     aud: String,
 }
 

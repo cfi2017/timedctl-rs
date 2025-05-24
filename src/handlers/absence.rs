@@ -11,6 +11,7 @@ use libtimed::{
 };
 
 /// List absences for the current user or all users
+#[allow(dead_code)]
 pub async fn list_absences(
     client: &TimedClient,
     date_str: Option<&str>,
@@ -150,6 +151,7 @@ pub async fn list_absences(
 }
 
 /// Create a new absence for the current user
+#[allow(dead_code)]
 pub async fn create_absence(
     client: &TimedClient,
     date_str: &str,
@@ -205,6 +207,7 @@ pub async fn create_absence(
 }
 
 /// Delete an absence by ID
+#[allow(dead_code)]
 pub async fn delete_absence(client: &TimedClient, absence_id: &str) -> Result<()> {
     let endpoint = format!("absences/{}", absence_id);
     client.delete(&endpoint).await?;
@@ -215,7 +218,8 @@ pub async fn delete_absence(client: &TimedClient, absence_id: &str) -> Result<()
     Ok(())
 }
 
-/// List available absence types
+/// List all available absence types
+#[allow(dead_code)]
 pub async fn list_absence_types(client: &TimedClient) -> Result<()> {
     let response = client
         .get::<ResourcesResponse<AbsenceType>>("absence-types", None)

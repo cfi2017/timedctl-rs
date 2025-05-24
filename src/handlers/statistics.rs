@@ -10,6 +10,7 @@ use libtimed::{
 };
 
 /// Get year statistics for the current user or a specific user
+#[allow(dead_code)]
 pub async fn get_year_statistics(
     client: &TimedClient,
     year: Option<i32>,
@@ -80,6 +81,7 @@ pub async fn get_year_statistics(
 }
 
 /// Get month statistics for the current user or a specific user
+#[allow(dead_code)]
 pub async fn get_month_statistics(
     client: &TimedClient,
     year: Option<i32>,
@@ -160,6 +162,7 @@ pub async fn get_month_statistics(
 }
 
 /// Get task statistics for a user and date range
+#[allow(dead_code)]
 pub async fn get_task_statistics(
     client: &TimedClient,
     from_date: Option<&str>,
@@ -301,6 +304,7 @@ pub async fn get_task_statistics(
 }
 
 /// Get user statistics
+#[allow(dead_code)]
 pub async fn get_user_statistics(
     client: &TimedClient,
     from_date: Option<&str>,
@@ -371,6 +375,7 @@ pub async fn get_user_statistics(
 }
 
 /// Get customer statistics
+#[allow(dead_code)]
 pub async fn get_customer_statistics(
     client: &TimedClient,
     from_date: Option<&str>,
@@ -440,6 +445,7 @@ pub async fn get_customer_statistics(
 }
 
 /// Get project statistics
+#[allow(dead_code)]
 pub async fn get_project_statistics(
     client: &TimedClient,
     from_date: Option<&str>,
@@ -541,17 +547,18 @@ pub async fn get_project_statistics(
 }
 
 /// Get work report
+#[allow(dead_code)]
 pub async fn get_work_report(
     client: &TimedClient,
     from_date: &str,
     to_date: &str,
     user_id: Option<&str>,
 ) -> Result<()> {
-    let mut filter = FilterParams::default();
-
-    // Add required date range
-    filter.from_date = Some(from_date.to_string());
-    filter.to_date = Some(to_date.to_string());
+    let mut filter = FilterParams {
+        from_date: Some(from_date.to_string()),
+        to_date: Some(to_date.to_string()),
+        ..Default::default()
+    };
 
     // Add user filter if specified
     if let Some(id) = user_id {
