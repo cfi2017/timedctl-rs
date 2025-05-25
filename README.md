@@ -166,11 +166,11 @@ This project uses GitHub Actions for continuous integration and deployment:
   - Running tests
   - Cross-platform builds (Linux, macOS, Windows)
 
-- **Release Workflow**: Automatically creates new releases when changes are merged to main:
-  - Uses go-semantic-release for version management based on conventional commits
-  - Builds binaries for multiple platforms
+- **Release Workflow**: Automatically creates new releases when version tags are pushed:
+  - Uses GoReleaser for building and releasing binaries
+  - Builds binaries for multiple platforms (Linux, macOS, Windows)
   - Attaches binaries to GitHub releases
-  - Updates CHANGELOG.md with release notes
+  - Generates release notes based on commits since the last tag
 
 ### Contributing
 
@@ -186,10 +186,10 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Releases
 
-Releases are managed automatically using go-semantic-release and GitHub Actions. When code is merged to the main branch, a new release is created if needed based on conventional commit messages:
+Releases are managed automatically using GoReleaser and GitHub Actions. When a new version tag is pushed, a new release is created:
 
 - `feat:` commits trigger a minor version bump
 - `fix:` commits trigger a patch version bump
 - `feat!:` or `fix!:` commits with breaking changes trigger a major version bump
 
-The release notes are generated automatically based on the commit messages. The configuration for go-semantic-release is stored in the `.semrelrc` file at the root of the project.
+The release notes are generated automatically based on the commit messages since the last tag. The configuration for GoReleaser is stored in the `.goreleaser.yaml` file at the root of the project.

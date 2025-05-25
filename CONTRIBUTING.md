@@ -23,9 +23,7 @@ Please be respectful and considerate of others when contributing to this project
    cargo install cargo-bump
    cargo install cargo-watch
    ```
-3. Install Go from [go.dev](https://go.dev/dl/) (required for go-semantic-release)
-4. Install go-semantic-release: `go install github.com/go-semantic-release/semantic-release/v2@latest`
-5. Install pre-commit: [pre-commit.com](https://pre-commit.com/#install)
+3. Install pre-commit: [pre-commit.com](https://pre-commit.com/#install)
 6. Set up the git hooks: `pre-commit install`
 7. Run tests to make sure everything is working: `cargo test`
 
@@ -73,14 +71,14 @@ Examples:
 
 ## Release Process
 
-Releases are managed automatically using go-semantic-release and GitHub Actions. When changes are merged to the main branch, the following happens:
+Releases are managed automatically using GoReleaser and GitHub Actions. When a new version tag is pushed, the following happens:
 
 1. Tests and checks are run
-2. If successful, go-semantic-release determines the next version based on commit messages
-3. A new release is created with automatically generated release notes
+2. If successful, GoReleaser builds binaries for multiple platforms
+3. A new release is created with automatically generated release notes based on commits since the last tag
 4. Binary artifacts are built and attached to the release
 
-The configuration for go-semantic-release is stored in the `.semrelrc` file at the root of the project.
+The configuration for GoReleaser is stored in the `.goreleaser.yaml` file at the root of the project.
 
 ## Testing
 
