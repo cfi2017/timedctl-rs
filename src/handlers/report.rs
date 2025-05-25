@@ -33,6 +33,9 @@ pub struct AddReportOptions {
 }
 
 /// Get reports for a specified date or date range
+///
+/// If no date parameters are provided, defaults to current date.
+/// Interactive mode can be enabled to prompt for date selection.
 pub async fn get_reports(
     client: &TimedClient,
     date_str: Option<&str>,
@@ -290,17 +293,28 @@ async fn get_reports_with_options(client: &TimedClient, options: GetReportsOptio
     Ok(())
 }
 
-/// Helper function to determine date parameters
+/// Determine date parameters for report queries
+///
+/// Priority order:
+/// 1. If interactive mode is enabled and no dates provided, prompt user
+/// 2. If no dates provided (non-interactive), default to current date
+/// 3. Otherwise, use provided date parameters
 async fn determine_date_parameters(
     options: &GetReportsOptions,
 ) -> Result<(Option<String>, Option<String>, Option<String>)> {
+    // If interactive mode is explicitly requested and no dates are provided, show interactive prompt
     if options.interactive
         && options.date.is_none()
         && options.from_date.is_none()
         && options.to_date.is_none()
     {
         interactive_date_selection().await
+    } else if options.date.is_none() && options.from_date.is_none() && options.to_date.is_none() {
+        // Default to current date when no date parameters are provided
+        let today = Local::now().format("%Y-%m-%d").to_string();
+        Ok((Some(today), None, None))
     } else {
+        // Use provided date parameters
         Ok((
             options.date.clone(),
             options.from_date.clone(),

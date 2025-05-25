@@ -145,9 +145,9 @@ enum GetCommands {
         #[arg(long)]
         to: Option<String>,
 
-        /// Use non-interactive mode (for scripting)
-        #[arg(short = 'n', long)]
-        non_interactive: bool,
+        /// Use interactive mode to prompt for date selection
+        #[arg(short = 'i', long)]
+        interactive: bool,
     },
 
     /// Get activities
@@ -575,7 +575,7 @@ async fn main() -> Result<()> {
                 from,
                 to,
                 all_users,
-                non_interactive,
+                interactive,
             } => {
                 if let Err(e) = report::get_reports(
                     &client,
@@ -583,7 +583,7 @@ async fn main() -> Result<()> {
                     from.as_deref(),
                     to.as_deref(),
                     all_users,
-                    !non_interactive,
+                    interactive,
                 )
                 .await
                 {
