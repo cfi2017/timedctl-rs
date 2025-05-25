@@ -1,0 +1,13 @@
+builds:
+  - id: "timedctl"
+    builder: "rust"
+    binary: "timedctl"
+    targets:
+      - "x86_64-unknown-linux-gnu"
+      - "x86_64-apple-darwin"
+      - "x86_64-pc-windows-msvc"
+    tool: "cross"
+    command: "build"
+    flags:
+      - "--release"
+    skip: false

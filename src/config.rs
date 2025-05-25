@@ -89,10 +89,10 @@ impl TimedConfig {
 
         let default_config = Self::default();
         let toml = toml::to_string_pretty(&default_config).map_err(|e| {
-            ConfigurationError::IoError(io::Error::new(
-                io::ErrorKind::Other,
-                format!("Failed to serialize default configuration: {}", e),
-            ))
+            ConfigurationError::IoError(io::Error::other(format!(
+                "Failed to serialize default configuration: {}",
+                e
+            )))
         })?;
 
         fs::write(path, toml)?;
