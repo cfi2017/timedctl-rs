@@ -42,5 +42,5 @@ jobs:
           hooks: goreleaser
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          update-file: Cargo.toml
-          changelog-file: CHANGELOG.md
+          # update-file: Cargo.toml
+          # changelog-file: CHANGELOG.md
