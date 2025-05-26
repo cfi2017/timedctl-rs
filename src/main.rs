@@ -304,6 +304,10 @@ enum AddCommands {
         #[arg(long)]
         duration: Option<String>,
 
+        /// Date for the report (format: YYYY-MM-DD, defaults to today)
+        #[arg(long)]
+        date: Option<String>,
+
         /// Show archived customers/projects/tasks
         #[arg(long)]
         show_archived: bool,
@@ -683,6 +687,7 @@ async fn main() -> Result<()> {
                 task,
                 description,
                 duration,
+                date,
                 show_archived,
                 review,
                 not_billable,
@@ -695,6 +700,7 @@ async fn main() -> Result<()> {
                     task.as_deref(),
                     description.as_deref(),
                     duration.as_deref(),
+                    date.as_deref(),
                     show_archived,
                     review,
                     not_billable,

@@ -26,6 +26,7 @@ pub struct AddReportOptions {
     pub task: Option<String>,
     pub description: Option<String>,
     pub duration: Option<String>,
+    pub date: Option<String>,
     pub show_archived: bool,
     pub review: bool,
     pub not_billable: bool,
@@ -567,6 +568,7 @@ pub async fn add_report(
     task: Option<&str>,
     description: Option<&str>,
     duration: Option<&str>,
+    date: Option<&str>,
     show_archived: bool,
     review: bool,
     not_billable: bool,
@@ -578,6 +580,7 @@ pub async fn add_report(
         task: task.map(String::from),
         description: description.map(String::from),
         duration: duration.map(String::from),
+        date: date.map(String::from),
         show_archived,
         review,
         not_billable,
@@ -592,11 +595,18 @@ async fn add_report_with_options(client: &TimedClient, options: AddReportOptions
     let comment = get_description_for_report(&options)?;
     let duration_str = get_duration_for_report(&options)?;
 
+    let report_date = if let Some(date_str) = &options.date {
+        parse_date(Some(date_str))?
+    } else {
+        chrono::Local::now().date_naive()
+    };
+
     let report_data = serde_json::json!({
         "data": {
             "type": "reports",
             "attributes": {
                 "comment": comment,
+                "date": report_date.format("%Y-%m-%d").to_string(),
                 "duration": duration_str,
                 "review": options.review,
                 "not-billable": options.not_billable
