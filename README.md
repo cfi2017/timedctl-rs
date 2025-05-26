@@ -91,6 +91,9 @@ timedctl activity stop
 # Add a time report
 timedctl add report --customer "Customer" --project "Project" --task "Task" --duration "1:30" --description "Description"
 
+# Add a time report for a specific date
+timedctl add report --customer "Customer" --project "Project" --task "Task" --duration "1:30" --description "Description" --date "2023-07-15"
+
 # View today's activities (for the current user by default)
 timedctl get activities
 
