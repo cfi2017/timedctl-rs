@@ -142,12 +142,12 @@ impl TimedConfig {
     /// Delete a token from the keyring
     pub fn delete_token(&self) -> Result<(), ConfigurationError> {
         let entry = Entry::new(APP_NAME, &self.username)?;
-        entry.delete_password()?;
+        entry.delete_credential()?;
         debug!("Deleted token from keyring for user: {}", self.username);
 
         // Also attempt to delete refresh token
         if let Ok(entry) = Entry::new(format!("{}_refresh", APP_NAME).as_str(), &self.username) {
-            let _ = entry.delete_password();
+            let _ = entry.delete_credential();
             debug!(
                 "Deleted refresh token from keyring for user: {}",
                 self.username
