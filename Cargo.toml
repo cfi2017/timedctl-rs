@@ -52,7 +52,7 @@ base64 = "0.21"
 # Web browser control
 
 
-webbrowser = "0.8"
+webbrowser = "1.0"
 
 [dev-dependencies]
 # Mock HTTP for testing
