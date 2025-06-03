@@ -59,5 +59,5 @@ webbrowser = "1.0"
 mockito = "1.2"
 # Test helpers
 pretty_assertions = "1.4"
-rstest = "0.18"
+rstest = "0.25"
 tempfile = "3.8"
