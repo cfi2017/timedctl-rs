@@ -38,7 +38,7 @@ chrono = { version = "0.4", features = ["serde"] }
 keyring = "3.6"
 # Config handling
 config = "0.15"
-toml = "0.5"
+toml = "0.8"
 # TUI components
 ratatui = "0.23"
 crossterm = "0.29"
