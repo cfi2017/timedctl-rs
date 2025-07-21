@@ -68,7 +68,7 @@ pub async fn list_absences(
         } else if from_str.is_some() || to_str.is_some() {
             let from_msg = from_str.map_or("today", |d| d);
             let to_msg = to_str.map_or("today", |d| d);
-            println!("No absences found from {} to {}", from_msg, to_msg);
+            println!("No absences found from {from_msg} to {to_msg}");
         } else {
             println!("No absences found for today");
         }
@@ -81,10 +81,10 @@ pub async fn list_absences(
     } else if from_str.is_some() || to_str.is_some() {
         let from_msg = from_str.map_or("today", |d| d);
         let to_msg = to_str.map_or("today", |d| d);
-        println!("Absences from {} to {}", from_msg, to_msg);
+        println!("Absences from {from_msg} to {to_msg}");
     } else {
         let today = Local::now().date_naive().format("%Y-%m-%d");
-        println!("Absences for {}", today);
+        println!("Absences for {today}");
     }
 
     println!("----------------------------------------");
@@ -134,17 +134,14 @@ pub async fn list_absences(
                         if let Some(username) =
                             user.attributes.get("username").and_then(|n| n.as_str())
                         {
-                            user_prefix = format!("[{}] ", username);
+                            user_prefix = format!("[{username}] ");
                         }
                     }
                 }
             }
         }
 
-        println!(
-            "{}Date: {} | Type: {} | Comment: {}",
-            user_prefix, date, absence_type_name, comment
-        );
+        println!("{user_prefix}Date: {date} | Type: {absence_type_name} | Comment: {comment}");
     }
 
     Ok(())
@@ -201,7 +198,7 @@ pub async fn create_absence(
         "Created absence for {} with ID: {:?}",
         date_str, response.data.id
     );
-    println!("Created absence for {}", date_str);
+    println!("Created absence for {date_str}");
 
     Ok(())
 }
@@ -209,7 +206,7 @@ pub async fn create_absence(
 /// Delete an absence by ID
 #[allow(dead_code)]
 pub async fn delete_absence(client: &TimedClient, absence_id: &str) -> Result<()> {
-    let endpoint = format!("absences/{}", absence_id);
+    let endpoint = format!("absences/{absence_id}");
     client.delete(&endpoint).await?;
 
     info!("Deleted absence with ID: {}", absence_id);

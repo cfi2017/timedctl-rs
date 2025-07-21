@@ -73,7 +73,7 @@ pub fn set_config(
     std::fs::write(config_path, toml).context("Failed to write configuration file")?;
 
     info!("Configuration updated successfully");
-    println!("{} = {}", key, value);
+    println!("{key} = {value}");
 
     Ok(())
 }

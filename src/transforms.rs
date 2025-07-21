@@ -45,7 +45,7 @@ impl Transform<Option<Duration>, Option<String>> for DurationTransform {
             let total_seconds = duration.num_seconds();
             let hours = total_seconds / 3600;
             let minutes = (total_seconds % 3600) / 60;
-            format!("{:02}:{:02}:00", hours, minutes)
+            format!("{hours:02}:{minutes:02}:00")
         })
     }
 

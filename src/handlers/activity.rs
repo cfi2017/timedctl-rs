@@ -173,7 +173,7 @@ pub async fn stop_activity(client: &TimedClient) -> Result<()> {
             });
 
             client
-                .patch::<_, serde_json::Value>(&format!("activities/{}", id), &update)
+                .patch::<_, serde_json::Value>(&format!("activities/{id}"), &update)
                 .await?;
             info!("Activity stopped");
             return Ok(());
@@ -243,7 +243,7 @@ pub async fn show_activity(
             } else if from_str.is_some() || to_str.is_some() {
                 let from_msg = from_str.map_or("today", |d| d);
                 let to_msg = to_str.map_or("today", |d| d);
-                println!("No activities found from {} to {}", from_msg, to_msg);
+                println!("No activities found from {from_msg} to {to_msg}");
             } else {
                 println!("No activities found for today");
             }
@@ -256,10 +256,10 @@ pub async fn show_activity(
         } else if from_str.is_some() || to_str.is_some() {
             let from_msg = from_str.map_or("today", |d| d);
             let to_msg = to_str.map_or("today", |d| d);
-            println!("Activities from {} to {}", from_msg, to_msg);
+            println!("Activities from {from_msg} to {to_msg}");
         } else {
             let today = Local::now().date_naive().format("%Y-%m-%d");
-            println!("Activities for {}", today);
+            println!("Activities for {today}");
         }
         println!("----------------------------------------");
 
@@ -361,19 +361,11 @@ pub async fn show_activity(
             // Format output
             if all_users {
                 println!(
-                    "[{}] {} - {} - {}/{}/{} - {}",
-                    username,
-                    from_time,
-                    duration_str,
-                    customer_name,
-                    project_name,
-                    task_name,
-                    comment
+                    "[{username}] {from_time} - {duration_str} - {customer_name}/{project_name}/{task_name} - {comment}"
                 );
             } else {
                 println!(
-                    "{} - {} - {}/{}/{} - {}",
-                    from_time, duration_str, customer_name, project_name, task_name, comment
+                    "{from_time} - {duration_str} - {customer_name}/{project_name}/{task_name} - {comment}"
                 );
             }
         }
@@ -389,7 +381,7 @@ pub async fn show_activity(
     } else if from_str.is_some() || to_str.is_some() {
         let from_msg = from_str.map_or("today", |d| d);
         let to_msg = to_str.map_or("today", |d| d);
-        println!("No activities found from {} to {}", from_msg, to_msg);
+        println!("No activities found from {from_msg} to {to_msg}");
     } else {
         println!("No activities found for today");
     }
@@ -424,7 +416,7 @@ pub async fn get_active_activity(client: &TimedClient, short: bool) -> Result<()
             let comment = activity["attributes"]["comment"]
                 .as_str()
                 .unwrap_or("No comment");
-            println!("{}", comment);
+            println!("{comment}");
             return Ok(());
         }
 
@@ -484,12 +476,12 @@ pub async fn get_active_activity(client: &TimedClient, short: bool) -> Result<()
 
                                         println!("Active Activity");
                                         println!("----------------------------------------");
-                                        println!("Activity: {}", comment);
-                                        println!("Customer: {}", customer_name);
-                                        println!("Project: {}", project_name);
-                                        println!("Task: {}", task_name);
-                                        println!("Started at: {}", from_time);
-                                        println!("Elapsed time: {:.2} hours", hours_elapsed);
+                                        println!("Activity: {comment}");
+                                        println!("Customer: {customer_name}");
+                                        println!("Project: {project_name}");
+                                        println!("Task: {task_name}");
+                                        println!("Started at: {from_time}");
+                                        println!("Elapsed time: {hours_elapsed:.2} hours");
 
                                         return Ok(());
                                     }
@@ -502,8 +494,8 @@ pub async fn get_active_activity(client: &TimedClient, short: bool) -> Result<()
         }
 
         // Fallback if we couldn't get all the details
-        println!("Active Activity: {}", comment);
-        println!("Started at: {}", from_time);
+        println!("Active Activity: {comment}");
+        println!("Started at: {from_time}");
     } else {
         println!("No active activity found");
     }
@@ -647,7 +639,7 @@ pub async fn delete_activity(client: &TimedClient, date_str: Option<&str>) -> Re
         std::io::stdin().read_line(&mut input)?;
 
         if input.trim().to_lowercase() == "y" {
-            client.delete(&format!("activities/{}", id)).await?;
+            client.delete(&format!("activities/{id}")).await?;
             info!("Activity deleted");
             return Ok(());
         } else {
@@ -757,13 +749,12 @@ pub async fn generate_timesheet(client: &TimedClient) -> Result<()> {
             }
 
             println!(
-                "{:.2}h - {} / {} / {} - {}",
-                duration_hours, customer_name, project_name, task_name, comment
+                "{duration_hours:.2}h - {customer_name} / {project_name} / {task_name} - {comment}"
             );
         }
 
         println!("----------------------------------------");
-        println!("Total: {:.2} hours", total_duration);
+        println!("Total: {total_duration:.2} hours");
 
         return Ok(());
     }

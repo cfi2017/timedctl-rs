@@ -69,7 +69,7 @@ pub async fn list_attendances(
         } else if from_str.is_some() || to_str.is_some() {
             let from_msg = from_str.map_or("today", |d| d);
             let to_msg = to_str.map_or("today", |d| d);
-            println!("No attendances found from {} to {}", from_msg, to_msg);
+            println!("No attendances found from {from_msg} to {to_msg}");
         } else {
             println!("No attendances found for today");
         }
@@ -82,10 +82,10 @@ pub async fn list_attendances(
     } else if from_str.is_some() || to_str.is_some() {
         let from_msg = from_str.map_or("today", |d| d);
         let to_msg = to_str.map_or("today", |d| d);
-        println!("Attendances from {} to {}", from_msg, to_msg);
+        println!("Attendances from {from_msg} to {to_msg}");
     } else {
         let today = Local::now().date_naive().format("%Y-%m-%d");
-        println!("Attendances for {}", today);
+        println!("Attendances for {today}");
     }
 
     println!("----------------------------------------");
@@ -117,17 +117,14 @@ pub async fn list_attendances(
                         if let Some(username) =
                             user.attributes.get("username").and_then(|n| n.as_str())
                         {
-                            user_prefix = format!("[{}] ", username);
+                            user_prefix = format!("[{username}] ");
                         }
                     }
                 }
             }
         }
 
-        println!(
-            "{}Date: {} | From: {} | To: {}",
-            user_prefix, date, from_time, to_time
-        );
+        println!("{user_prefix}Date: {date} | From: {from_time} | To: {to_time}");
     }
 
     Ok(())
@@ -199,7 +196,7 @@ pub async fn update_attendance(
     to_time: Option<&str>,
 ) -> Result<()> {
     // Fetch current attendance data
-    let endpoint = format!("attendances/{}", attendance_id);
+    let endpoint = format!("attendances/{attendance_id}");
     let current = client
         .get::<ResourceResponse<Attendance>>(&endpoint, None)
         .await?;
@@ -240,7 +237,7 @@ pub async fn update_attendance(
 /// Delete an attendance record by ID
 #[allow(dead_code)]
 pub async fn delete_attendance(client: &TimedClient, attendance_id: &str) -> Result<()> {
-    let endpoint = format!("attendances/{}", attendance_id);
+    let endpoint = format!("attendances/{attendance_id}");
     client.delete(&endpoint).await?;
 
     info!("Deleted attendance with ID: {}", attendance_id);

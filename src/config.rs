@@ -90,8 +90,7 @@ impl TimedConfig {
         let default_config = Self::default();
         let toml = toml::to_string_pretty(&default_config).map_err(|e| {
             ConfigurationError::IoError(io::Error::other(format!(
-                "Failed to serialize default configuration: {}",
-                e
+                "Failed to serialize default configuration: {e}"
             )))
         })?;
 
@@ -111,7 +110,7 @@ impl TimedConfig {
 
     /// Store a refresh token in the keyring
     pub fn store_refresh_token(&self, token: &str) -> Result<(), ConfigurationError> {
-        let entry = Entry::new(format!("{}_refresh", APP_NAME).as_str(), &self.username)?;
+        let entry = Entry::new(format!("{APP_NAME}_refresh").as_str(), &self.username)?;
         entry.set_password(token)?;
         debug!(
             "Stored refresh token in keyring for user: {}",
@@ -130,7 +129,7 @@ impl TimedConfig {
 
     /// Retrieve a refresh token from the keyring
     pub fn get_refresh_token(&self) -> Result<String, ConfigurationError> {
-        let entry = Entry::new(format!("{}_refresh", APP_NAME).as_str(), &self.username)?;
+        let entry = Entry::new(format!("{APP_NAME}_refresh").as_str(), &self.username)?;
         let token = entry.get_password()?;
         debug!(
             "Retrieved refresh token from keyring for user: {}",
@@ -146,7 +145,7 @@ impl TimedConfig {
         debug!("Deleted token from keyring for user: {}", self.username);
 
         // Also attempt to delete refresh token
-        if let Ok(entry) = Entry::new(format!("{}_refresh", APP_NAME).as_str(), &self.username) {
+        if let Ok(entry) = Entry::new(format!("{APP_NAME}_refresh").as_str(), &self.username) {
             let _ = entry.delete_credential();
             debug!(
                 "Deleted refresh token from keyring for user: {}",
@@ -170,7 +169,7 @@ impl TimedConfig {
     /// Check if a refresh token exists in the keyring
     #[allow(dead_code)]
     pub fn has_refresh_token(&self) -> bool {
-        let entry = Entry::new(format!("{}_refresh", APP_NAME).as_str(), &self.username).ok();
+        let entry = Entry::new(format!("{APP_NAME}_refresh").as_str(), &self.username).ok();
         if let Some(entry) = entry {
             entry.get_password().is_ok()
         } else {

@@ -37,11 +37,11 @@ pub async fn get_year_statistics(
         .await?;
 
     if response.data.is_empty() {
-        println!("No year statistics found for year {}", year_value);
+        println!("No year statistics found for year {year_value}");
         return Ok(());
     }
 
-    println!("Year Statistics for {}", year_value);
+    println!("Year Statistics for {year_value}");
     println!("----------------------------------------");
 
     // Get included data
@@ -72,8 +72,7 @@ pub async fn get_year_statistics(
         }
 
         println!(
-            "User: {} | Total Time: {} | Total Attendance: {}",
-            user_name, duration, total_attendance
+            "User: {user_name} | Total Time: {duration} | Total Attendance: {total_attendance}"
         );
     }
 
@@ -115,14 +114,11 @@ pub async fn get_month_statistics(
         .await?;
 
     if response.data.is_empty() {
-        println!(
-            "No month statistics found for {}/{}",
-            year_value, month_value
-        );
+        println!("No month statistics found for {year_value}/{month_value}");
         return Ok(());
     }
 
-    println!("Month Statistics for {}/{}", year_value, month_value);
+    println!("Month Statistics for {year_value}/{month_value}");
     println!("----------------------------------------");
 
     // Get included data
@@ -153,8 +149,7 @@ pub async fn get_month_statistics(
         }
 
         println!(
-            "User: {} | Total Time: {} | Total Attendance: {}",
-            user_name, duration, total_attendance
+            "User: {user_name} | Total Time: {duration} | Total Attendance: {total_attendance}"
         );
     }
 
@@ -295,8 +290,7 @@ pub async fn get_task_statistics(
         }
 
         println!(
-            "User: {} | Customer: {} | Project: {} | Task: {} | Duration: {}",
-            user_name, customer_name, project_name, task_name, duration
+            "User: {user_name} | Customer: {customer_name} | Project: {project_name} | Task: {task_name} | Duration: {duration}"
         );
     }
 
@@ -368,7 +362,7 @@ pub async fn get_user_statistics(
             }
         }
 
-        println!("User: {} | Total Time: {}", user_name, duration);
+        println!("User: {user_name} | Total Time: {duration}");
     }
 
     Ok(())
@@ -438,7 +432,7 @@ pub async fn get_customer_statistics(
             }
         }
 
-        println!("Customer: {} | Total Time: {}", customer_name, duration);
+        println!("Customer: {customer_name} | Total Time: {duration}");
     }
 
     Ok(())
@@ -537,10 +531,7 @@ pub async fn get_project_statistics(
             }
         }
 
-        println!(
-            "Customer: {} | Project: {} | Total Time: {}",
-            customer_name, project_name, duration
-        );
+        println!("Customer: {customer_name} | Project: {project_name} | Total Time: {duration}");
     }
 
     Ok(())
@@ -574,7 +565,7 @@ pub async fn get_work_report(
         return Ok(());
     }
 
-    println!("Work Report from {} to {}", from_date, to_date);
+    println!("Work Report from {from_date} to {to_date}");
     println!("----------------------------------------");
 
     // Display report data
@@ -582,7 +573,7 @@ pub async fn get_work_report(
         // Work report data is a complex JSON structure
         // Here we just print it as formatted JSON
         let data_str = serde_json::to_string_pretty(&report.attributes.data)?;
-        println!("{}", data_str);
+        println!("{data_str}");
     }
 
     Ok(())

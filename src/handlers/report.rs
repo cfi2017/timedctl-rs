@@ -112,11 +112,11 @@ async fn get_reports_with_options(client: &TimedClient, options: GetReportsOptio
     if let Some(reports) = response["data"].as_array() {
         if reports.is_empty() {
             if let Some(ref date) = date_param {
-                println!("No reports found for date: {}", date);
+                println!("No reports found for date: {date}");
             } else if from_param.is_some() || to_param.is_some() {
                 let from_msg = from_param.as_deref().unwrap_or("today");
                 let to_msg = to_param.as_deref().unwrap_or("today");
-                println!("No reports found from {} to {}", from_msg, to_msg);
+                println!("No reports found from {from_msg} to {to_msg}");
             } else {
                 println!("No reports found for today");
             }
@@ -125,14 +125,14 @@ async fn get_reports_with_options(client: &TimedClient, options: GetReportsOptio
 
         // Display date range in the header
         if let Some(ref date) = date_param {
-            println!("Reports for {}", date);
+            println!("Reports for {date}");
         } else if from_param.is_some() || to_param.is_some() {
             let from_msg = from_param.as_deref().unwrap_or("today");
             let to_msg = to_param.as_deref().unwrap_or("today");
-            println!("Reports from {} to {}", from_msg, to_msg);
+            println!("Reports from {from_msg} to {to_msg}");
         } else {
             let today = Local::now().date_naive().format("%Y-%m-%d");
-            println!("Reports for {}", today);
+            println!("Reports for {today}");
         }
         println!("----------------------------------------");
 
@@ -267,27 +267,26 @@ async fn get_reports_with_options(client: &TimedClient, options: GetReportsOptio
                         username = user["attributes"]["username"].as_str().unwrap_or(username);
                     }
                 }
-                prefix = format!("[{}] ", username);
+                prefix = format!("[{username}] ");
             }
 
             println!(
-                "{}{} - {} / {} / {} - {}",
-                prefix, duration, customer_name, project_name, task_name, comment
+                "{prefix}{duration} - {customer_name} / {project_name} / {task_name} - {comment}"
             );
         }
 
         println!("----------------------------------------");
-        println!("Total: {:.2} hours", total_duration);
+        println!("Total: {total_duration:.2} hours");
         return Ok(());
     }
 
     // If we get here, no reports were found
     if let Some(ref date) = date_param {
-        println!("No reports found for date: {}", date);
+        println!("No reports found for date: {date}");
     } else if from_param.is_some() || to_param.is_some() {
         let from_msg = from_param.as_deref().unwrap_or("today");
         let to_msg = to_param.as_deref().unwrap_or("today");
-        println!("No reports found from {} to {}", from_msg, to_msg);
+        println!("No reports found from {from_msg} to {to_msg}");
     } else {
         println!("No reports found for today");
     }
@@ -395,7 +394,7 @@ pub async fn get_report_intersection(
         if let Some(task) = attributes.get("task") {
             if !task.is_null() {
                 if let Some(task_id) = task.get("id").and_then(|id| id.as_str()) {
-                    println!("Task: {}", task_id);
+                    println!("Task: {task_id}");
                 }
             } else {
                 println!("Task: <varies>");
@@ -465,16 +464,12 @@ pub async fn bulk_update_reports(
         return Ok(());
     }
 
-    println!(
-        "Found {} reports matching the filter criteria",
-        report_count
-    );
+    println!("Found {report_count} reports matching the filter criteria");
 
     // Confirm the bulk update
     let confirm = Confirm::with_theme(&ColorfulTheme::default())
         .with_prompt(format!(
-            "Are you sure you want to update {} reports?",
-            report_count
+            "Are you sure you want to update {report_count} reports?"
         ))
         .default(false)
         .interact()?;
@@ -538,7 +533,7 @@ pub async fn export_reports(
     let response = client
         .http_client()
         .get(url)
-        .header("Authorization", format!("Bearer {}", token))
+        .header("Authorization", format!("Bearer {token}"))
         .query(&params)
         .send()
         .await?;
@@ -628,8 +623,8 @@ async fn add_report_with_options(client: &TimedClient, options: AddReportOptions
 
     if response.get("data").is_some() {
         println!("Report added successfully");
-        println!("Duration: {}", duration_str);
-        println!("Description: {}", comment);
+        println!("Duration: {duration_str}");
+        println!("Description: {comment}");
     } else {
         return Err(anyhow::anyhow!("Failed to create report"));
     }
@@ -723,14 +718,14 @@ fn round_duration_to_15min(duration_str: &str) -> Result<String> {
         let adjusted_hours = hours + (rounded_minutes / 60);
         let adjusted_minutes = rounded_minutes % 60;
 
-        Ok(format!("{:02}:{:02}:00", adjusted_hours, adjusted_minutes))
+        Ok(format!("{adjusted_hours:02}:{adjusted_minutes:02}:00"))
     } else if let Ok(decimal_hours) = duration_str.parse::<f32>() {
         let total_minutes = (decimal_hours * 60.0).round() as u32;
         let rounded_minutes = ((total_minutes as f32 / 15.0).round() * 15.0) as u32;
         let hours = rounded_minutes / 60;
         let minutes = rounded_minutes % 60;
 
-        Ok(format!("{:02}:{:02}:00", hours, minutes))
+        Ok(format!("{hours:02}:{minutes:02}:00"))
     } else {
         Err(anyhow::anyhow!("Invalid duration format"))
     }
@@ -868,7 +863,7 @@ pub async fn delete_report(
                         username = user["attributes"]["username"].as_str().unwrap_or(username);
                     }
                 }
-                prefix = format!("[{}] ", username);
+                prefix = format!("[{username}] ");
             }
 
             println!(
@@ -942,8 +937,7 @@ pub async fn delete_report(
                 }
 
                 report_options.push(format!(
-                    "{} - {} / {} / {} - {}",
-                    duration, customer_name, project_name, task_name, comment
+                    "{duration} - {customer_name} / {project_name} / {task_name} - {comment}"
                 ));
             }
 
@@ -990,7 +984,7 @@ pub async fn delete_report(
         std::io::stdin().read_line(&mut input)?;
 
         if input.trim().to_lowercase() == "y" {
-            client.delete(&format!("reports/{}", id)).await?;
+            client.delete(&format!("reports/{id}")).await?;
             info!("Report deleted");
             return Ok(());
         } else {
@@ -1106,8 +1100,7 @@ pub async fn edit_report(
                 }
 
                 report_options.push(format!(
-                    "{} - {} / {} / {} - {}",
-                    duration, customer_name, project_name, task_name, comment
+                    "{duration} - {customer_name} / {project_name} / {task_name} - {comment}"
                 ));
             }
 
@@ -1211,7 +1204,7 @@ pub async fn edit_report(
         });
 
         client
-            .patch::<_, serde_json::Value>(&format!("reports/{}", id), &report)
+            .patch::<_, serde_json::Value>(&format!("reports/{id}"), &report)
             .await?;
 
         println!("Report updated successfully");
