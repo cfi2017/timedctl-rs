@@ -42,7 +42,7 @@ pub fn format_duration(duration_str: &str) -> Result<String> {
     let hours = total_minutes / 60;
     let minutes = total_minutes % 60;
 
-    Ok(format!("{:02}:{:02}:00", hours, minutes))
+    Ok(format!("{hours:02}:{minutes:02}:00"))
 }
 
 /// Get the current user

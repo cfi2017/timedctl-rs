@@ -430,7 +430,7 @@ fn init_logging(verbosity: u8) {
     };
 
     let filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new(format!("timedctl={}", log_level)));
+        .unwrap_or_else(|_| EnvFilter::new(format!("timedctl={log_level}")));
 
     let subscriber = FmtSubscriber::builder().with_env_filter(filter).finish();
 
@@ -571,7 +571,7 @@ async fn main() -> Result<()> {
         }
         Commands::Get(cmd) => match cmd.command {
             GetCommands::Overtime { date } => match get_overtime(&client, date.as_deref()).await {
-                Ok(balance) => println!("Overtime: {}", balance),
+                Ok(balance) => println!("Overtime: {balance}"),
                 Err(e) => error!("Failed to get overtime: {}", e),
             },
             GetCommands::Reports {

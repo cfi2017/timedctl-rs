@@ -102,14 +102,13 @@ impl AuthClient {
                 status, text
             );
             return Err(AuthError::AuthFailed(format!(
-                "Failed to fetch OpenID configuration: HTTP {}: {}",
-                status, text
+                "Failed to fetch OpenID configuration: HTTP {status}: {text}"
             )));
         }
 
         response.json::<OpenIdConfiguration>().await.map_err(|e| {
             error!("Failed to parse OpenID configuration: {}", e);
-            AuthError::TokenDecode(format!("Failed to parse OpenID configuration: {}", e))
+            AuthError::TokenDecode(format!("Failed to parse OpenID configuration: {e}"))
         })
     }
 
@@ -146,14 +145,13 @@ impl AuthClient {
                 status, text
             );
             return Err(AuthError::AuthFailed(format!(
-                "Device flow request failed: HTTP {}: {}",
-                status, text
+                "Device flow request failed: HTTP {status}: {text}"
             )));
         }
 
         response.json::<DeviceAuthResponse>().await.map_err(|e| {
             error!("Failed to parse device auth response: {}", e);
-            AuthError::TokenDecode(format!("Failed to parse device auth response: {}", e))
+            AuthError::TokenDecode(format!("Failed to parse device auth response: {e}"))
         })
     }
 
@@ -220,7 +218,7 @@ impl AuthClient {
                 debug!("Successfully received token");
                 return response.json::<TokenResponse>().await.map_err(|e| {
                     error!("Failed to parse token response: {}", e);
-                    AuthError::TokenDecode(format!("Failed to parse token response: {}", e))
+                    AuthError::TokenDecode(format!("Failed to parse token response: {e}"))
                 });
             }
 
@@ -267,8 +265,7 @@ impl AuthClient {
                         continue;
                     } else {
                         return Err(AuthError::AuthFailed(format!(
-                            "Failed to obtain token: {}",
-                            error
+                            "Failed to obtain token: {error}"
                         )));
                     }
                 }
@@ -285,9 +282,9 @@ impl AuthClient {
         }
 
         // Decode the payload (second part)
-        let payload = URL_SAFE_NO_PAD.decode(parts[1]).map_err(|e| {
-            AuthError::TokenDecode(format!("Failed to decode token payload: {}", e))
-        })?;
+        let payload = URL_SAFE_NO_PAD
+            .decode(parts[1])
+            .map_err(|e| AuthError::TokenDecode(format!("Failed to decode token payload: {e}")))?;
 
         // Parse the JSON claims
         let claims: TokenClaims =
@@ -420,8 +417,7 @@ impl AuthClient {
             let text = response.text().await.unwrap_or_default();
             warn!("Token refresh failed with status {}: {}", status, text);
             return Err(AuthError::AuthFailed(format!(
-                "Token refresh failed: {}",
-                text
+                "Token refresh failed: {text}"
             )));
         }
 
@@ -433,12 +429,12 @@ impl AuthClient {
         // Store the new token
         self.config
             .store_token(&token_response.access_token)
-            .map_err(|e| AuthError::AuthFailed(format!("Failed to store token: {}", e)))?;
+            .map_err(|e| AuthError::AuthFailed(format!("Failed to store token: {e}")))?;
 
         // Also store the refresh token if we got a new one
         if let Some(refresh) = &token_response.refresh_token {
             self.config.store_refresh_token(refresh).map_err(|e| {
-                AuthError::AuthFailed(format!("Failed to store refresh token: {}", e))
+                AuthError::AuthFailed(format!("Failed to store refresh token: {e}"))
             })?;
         }
 

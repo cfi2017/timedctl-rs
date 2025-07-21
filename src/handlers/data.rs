@@ -26,7 +26,7 @@ pub async fn get_customers(client: &TimedClient, output_format: &str) -> Result<
                     let archived = customer["attributes"]["archived"]
                         .as_bool()
                         .unwrap_or(false);
-                    println!("{},{},{}", id, name, archived);
+                    println!("{id},{name},{archived}");
                 }
             }
             "text" => {
@@ -37,7 +37,7 @@ pub async fn get_customers(client: &TimedClient, output_format: &str) -> Result<
                     let archived = customer["attributes"]["archived"]
                         .as_bool()
                         .unwrap_or(false);
-                    println!("{}: {} (archived: {})", id, name, archived);
+                    println!("{id}: {name} (archived: {archived})");
                 }
             }
             _ => {
@@ -111,7 +111,7 @@ pub async fn get_projects(
                     let customer_id = project["relationships"]["customer"]["data"]["id"]
                         .as_str()
                         .unwrap_or("");
-                    println!("{},{},{},{}", id, name, customer_id, archived);
+                    println!("{id},{name},{customer_id},{archived}");
                 }
             }
             "text" => {
@@ -123,10 +123,7 @@ pub async fn get_projects(
                     let customer_id = project["relationships"]["customer"]["data"]["id"]
                         .as_str()
                         .unwrap_or("");
-                    println!(
-                        "{}: {} (customer: {}, archived: {})",
-                        id, name, customer_id, archived
-                    );
+                    println!("{id}: {name} (customer: {customer_id}, archived: {archived})");
                 }
             }
             _ => {
@@ -290,7 +287,7 @@ pub async fn get_tasks(
                     let project_id = task["relationships"]["project"]["data"]["id"]
                         .as_str()
                         .unwrap_or("");
-                    println!("{},{},{},{}", id, name, project_id, archived);
+                    println!("{id},{name},{project_id},{archived}");
                 }
             }
             "text" => {
@@ -302,10 +299,7 @@ pub async fn get_tasks(
                     let project_id = task["relationships"]["project"]["data"]["id"]
                         .as_str()
                         .unwrap_or("");
-                    println!(
-                        "{}: {} (project: {}, archived: {})",
-                        id, name, project_id, archived
-                    );
+                    println!("{id}: {name} (project: {project_id}, archived: {archived})");
                 }
             }
             _ => {

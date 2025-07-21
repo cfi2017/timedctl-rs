@@ -56,7 +56,7 @@ impl TimedClient {
             .build()
             .expect("Failed to build HTTP client");
 
-        let base_url = format!("{}/{}/", base_url, api_namespace);
+        let base_url = format!("{base_url}/{api_namespace}/");
 
         Self {
             http_client,
@@ -119,7 +119,7 @@ impl TimedClient {
             debug!(
                 "Making GET request to {} with params: {:?}",
                 endpoint,
-                serde_json::to_string(p).unwrap_or_else(|_| format!("{:?}", p))
+                serde_json::to_string(p).unwrap_or_else(|_| format!("{p:?}"))
             );
         } else {
             debug!("Making GET request to {}", endpoint);
@@ -136,8 +136,7 @@ impl TimedClient {
                 404 => Err(TimedError::NotFound(endpoint.to_string())),
                 401 | 403 => Err(TimedError::AuthenticationRequired),
                 _ => Err(TimedError::InvalidResponse(format!(
-                    "HTTP {}: {}",
-                    status, text
+                    "HTTP {status}: {text}"
                 ))),
             };
         }
@@ -175,7 +174,7 @@ impl TimedClient {
         debug!(
             "Making POST request to {} with data: {}",
             endpoint,
-            serde_json::to_string(data).unwrap_or_else(|_| format!("{:?}", data))
+            serde_json::to_string(data).unwrap_or_else(|_| format!("{data:?}"))
         );
         let response = req.send().await?;
 
@@ -188,8 +187,7 @@ impl TimedClient {
                 404 => Err(TimedError::NotFound(endpoint.to_string())),
                 401 | 403 => Err(TimedError::AuthenticationRequired),
                 _ => Err(TimedError::InvalidResponse(format!(
-                    "HTTP {}: {}",
-                    status, text
+                    "HTTP {status}: {text}"
                 ))),
             };
         }
@@ -227,7 +225,7 @@ impl TimedClient {
         debug!(
             "Making PATCH request to {} with data: {}",
             endpoint,
-            serde_json::to_string(data).unwrap_or_else(|_| format!("{:?}", data))
+            serde_json::to_string(data).unwrap_or_else(|_| format!("{data:?}"))
         );
         let response = req.send().await?;
 
@@ -240,8 +238,7 @@ impl TimedClient {
                 404 => Err(TimedError::NotFound(endpoint.to_string())),
                 401 | 403 => Err(TimedError::AuthenticationRequired),
                 _ => Err(TimedError::InvalidResponse(format!(
-                    "HTTP {}: {}",
-                    status, text
+                    "HTTP {status}: {text}"
                 ))),
             };
         }
@@ -282,8 +279,7 @@ impl TimedClient {
                 404 => Err(TimedError::NotFound(endpoint.to_string())),
                 401 | 403 => Err(TimedError::AuthenticationRequired),
                 _ => Err(TimedError::InvalidResponse(format!(
-                    "HTTP {}: {}",
-                    status, text
+                    "HTTP {status}: {text}"
                 ))),
             };
         }
