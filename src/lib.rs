@@ -14,6 +14,9 @@ use tracing::{debug, error};
 pub mod models;
 pub mod transforms;
 
+#[cfg(test)]
+mod api_compatibility_test;
+
 use models::FilterParams;
 
 /// Error types for the libtimed library
