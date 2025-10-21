@@ -35,6 +35,8 @@
       in
       {
         devShells.default = pkgs.mkShell {
+          inherit (self.checks.${system}.pre-commit-check) shellHook;
+          NIX_CONFIG = "experimental-features = nix-command flakes";
           buildInputs = with pkgs; [
             rustToolchain
             pkg-config
