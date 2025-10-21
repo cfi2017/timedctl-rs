@@ -5,9 +5,13 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     rust-overlay.url = "github:oxalica/rust-overlay";
+    pre-commit-hooks = {
+      url = "github:cachix/pre-commit-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, flake-utils, rust-overlay }: 
+  outputs = { self, nixpkgs, flake-utils, rust-overlay, pre-commit-hooks }: 
     flake-utils.lib.eachDefaultSystem (system: 
       let
         overlays = [ (import rust-overlay )];
@@ -16,6 +20,17 @@
         };
         rustToolchain = pkgs.rust-bin.nightly.latest.default.override {
           extensions = [ "rust-src" "rust-analyzer" ];
+        };
+        formatter = let pkgs = nixpkgs.legacyPackages.${system};
+        in pkgs.nixfmt-rfc-style;
+        checks = {
+          pre-commit-check = pre-commit-hooks.lib.${system}.run {
+            src = ./.;
+            hooks = {
+              statix.enable = false;
+              nixfmt-rfc-style.enable = true;
+            };
+          };
         };
       in
       {
@@ -38,6 +53,9 @@
           nativeBuildInputs = [ pkgs.pkg-config ];
           # buildInputs = [ pkgs.openssl ];
         };
+
+        formatter = formatter;
+        checks = checks;
       }
     );
 }
