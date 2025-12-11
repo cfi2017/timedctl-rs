@@ -11,18 +11,32 @@
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, rust-overlay, pre-commit-hooks }: 
-    flake-utils.lib.eachDefaultSystem (system: 
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      rust-overlay,
+      pre-commit-hooks,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
-        overlays = [ (import rust-overlay )];
+        overlays = [ (import rust-overlay) ];
         pkgs = import nixpkgs {
           inherit system overlays;
         };
         rustToolchain = pkgs.rust-bin.nightly.latest.default.override {
-          extensions = [ "rust-src" "rust-analyzer" ];
+          extensions = [
+            "rust-src"
+            "rust-analyzer"
+          ];
         };
-        formatter = let pkgs = nixpkgs.legacyPackages.${system};
-        in pkgs.nixfmt-rfc-style;
+        formatter =
+          let
+            pkgs = nixpkgs.legacyPackages.${system};
+          in
+          pkgs.nixfmt-rfc-style;
         checks = {
           pre-commit-check = pre-commit-hooks.lib.${system}.run {
             src = ./.;
@@ -43,18 +57,20 @@
           ];
         };
 
-        packages.default = (pkgs.makeRustPlatform {
-          cargo = rustToolchain;
-          rustc = rustToolchain;
-        }).buildRustPackage {
-          pname = "timedctl";
-          version = "0.1.0";
-          src = ./.;
-          cargoLock.lockFile = ./Cargo.lock;
+        packages.default =
+          (pkgs.makeRustPlatform {
+            cargo = rustToolchain;
+            rustc = rustToolchain;
+          }).buildRustPackage
+            {
+              pname = "timedctl";
+              version = "0.1.0";
+              src = ./.;
+              cargoLock.lockFile = ./Cargo.lock;
 
-          nativeBuildInputs = [ pkgs.pkg-config ];
-          # buildInputs = [ pkgs.openssl ];
-        };
+              nativeBuildInputs = [ pkgs.pkg-config ];
+              # buildInputs = [ pkgs.openssl ];
+            };
 
         formatter = formatter;
         checks = checks;
