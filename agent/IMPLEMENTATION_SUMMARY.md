@@ -84,6 +84,23 @@ This document summarizes the enhancements made to the timedctl-rs library to ach
 - Request/response validation
 - Error handling verification
 
+### API Compatibility Testing
+- **Comprehensive compatibility test suite** to ensure data model compatibility with the old Django backend
+- **Missing field detection**: Automated testing identifies 38+ missing fields across models
+- **Regression prevention**: Tests fail if existing compatible fields are accidentally removed
+- **Field format validation**: Ensures JSON field naming (kebab-case) matches Django API format
+- **Mock API responses**: Tests against realistic Django API response formats
+- **Progress tracking**: Live documentation of implementation status vs. missing fields
+
+Key compatibility test categories:
+- Individual model compatibility tests for Activity, Report, Customer, Project, Task, User, etc.
+- Collection response format validation
+- Field naming consistency (kebab-case vs snake_case)
+- Resource name mapping verification
+- Serialization/deserialization round-trip testing
+
+Current status: **Basic compatibility achieved** for core fields, with detailed documentation of remaining 38 fields to implement for full API compatibility.
+
 ## Error Handling
 
 Enhanced error handling throughout the API client:
